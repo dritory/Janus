@@ -1,0 +1,7 @@
+[Name:orc]
+[Char:o]
+[Color:63:127:63]
+[Component:DestructibleMonster:20:0:dead orc]
+[Component:Attacker:5]
+[Component:MonsterAI]
+

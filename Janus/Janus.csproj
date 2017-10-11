@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2E4F3440-44AD-4961-AA5B-78F0E288C8A6}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Janus</RootNamespace>
+    <AssemblyName>Janus</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Janus.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="bin\Debug\data\items\potions\Potion_health.raw" />
+    <None Include="Content\font.ttf" />
+    <None Include=".DS_Store" />
+    <None Include="libSDL.so" />
+    <None Include="libtcod-net-unmanaged-linux.so" />
+    <None Include="libtcod-net-unmanaged-mac.so" />
+    <None Include="libtcod-net.dll.config" />
+    <None Include="libtcod.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="libtcod.dylib" />
+    <None Include="libtcod.so" />
+    <None Include="libtcodxx.so" />
+    <None Include="Names\jice_celtic.cfg" />
+    <None Include="Names\jice_fantasy.cfg" />
+    <None Include="Names\jice_mesopotamian.cfg" />
+    <None Include="Names\jice_norse.cfg" />
+    <None Include="Names\jice_region.cfg" />
+    <None Include="Names\jice_town.cfg" />
+    <None Include="Names\mingos_demon.cfg" />
+    <None Include="Names\mingos_dwarf.cfg" />
+    <None Include="Names\mingos_norse.cfg" />
+    <None Include="Names\mingos_standard.cfg" />
+    <None Include="Names\mingos_town.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\data\blocks\Door_wood.raw" />
+    <Content Include="bin\Debug\data\blocks\Granite.raw" />
+    <Content Include="bin\Debug\data\blocks\Stair.raw" />
+    <Content Include="bin\Debug\data\creatures\Kobold.raw" />
+    <Content Include="bin\Debug\data\creatures\Raw.raw" />
+    <Content Include="bin\Debug\data\creatures\Orc.raw" />
+    <Content Include="bin\Debug\data\creatures\Troll.raw" />
+    <Content Include="bin\Debug\data\items\Rock_throwable.raw" />
+    <Content Include="Content\curses_640x300.bmp" />
+    <Content Include="Content\curses_640x300.png" />
+    <Content Include="Content\curses_800x600.bmp" />
+    <Content Include="Content\curses_800x600.png" />
+    <Content Include="Content\curses_square_16x16.bmp" />
+    <Content Include="Content\curses_square_16x16.png" />
+    <Content Include="Content\font license.txt" />
+    <Content Include="celtic_garamond_10x10_gs_tc.png" />
+    <Content Include="circle.png" />
+    <Content Include="terminal.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="terminal8x8_gs_ro.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\fastJSON\fastJSON net35.csproj" />
+    <Content Include="Tools\fastJSON\fastJSON-android.csproj" />
+    <Content Include="Tools\fastJSON\fastJSON-SL.csproj" />
+    <Content Include="Tools\fastJSON\fastJSON.csproj" />
+    <Content Include="Tools\fastJSON\history.txt" />
+    <None Include="libtcod-net-unmanaged.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="libtcod-net.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="libtcod-VS.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="References\Creatures\Troll.raw" />
+    <Content Include="References\Creatures\Orc.raw" />
+    <Content Include="References\Creatures\Raw.raw" />
+    <None Include="SDL.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="skull.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestApp.exe" />
+    <None Include="Tools\fastJSON\fastJSON.snk" />
+    <None Include="Tools\fastJSON\README.md" />
+    <None Include="zlib1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SdlDotNet.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="libtcod-net, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libtcod 1.5.1 c#\libtcod-net.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="SdlDotNet, Version=6.1.0.0, Culture=neutral, PublicKeyToken=26ad4f7e10c61408, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\SdlDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Engine\Actors\Actor.cs" />
+    <Compile Include="Engine\Actors\ActorHandler.cs" />
+    <Compile Include="Engine\Actors\Component.cs" />
+    <Compile Include="Engine\Actors\Components\AI.cs" />
+    <Compile Include="Engine\Actors\Components\AIs\ConfusedMonsterAi.cs" />
+    <Compile Include="Engine\Actors\Components\AIs\MonsterAI.cs" />
+    <Compile Include="Engine\Actors\Components\AIs\PlayerAI.cs" />
+    <Compile Include="Engine\Actors\Components\AIs\TemporaryAi.cs" />
+    <Compile Include="Engine\Actors\Components\Attacker.cs" />
+    <Compile Include="Engine\Actors\Components\Blocks\Activatable.cs" />
+    <Compile Include="Engine\Actors\Components\Blocks\Door.cs" />
+    <Compile Include="Engine\Actors\Components\Blocks\Portal.cs" />
+    <Compile Include="Engine\Actors\Components\Blocks\Stair.cs" />
+    <Compile Include="Engine\Actors\Components\Container.cs" />
+    <Compile Include="Engine\Actors\Components\Destructible.cs" />
+    <Compile Include="Engine\Actors\Components\DestructibleMonster.cs" />
+    <Compile Include="Engine\Actors\Components\Effect.cs" />
+    <Compile Include="Engine\Actors\Components\Effects\ChangeAiEffect.cs" />
+    <Compile Include="Engine\Actors\Components\Effects\HealthEffect.cs" />
+    <Compile Include="Engine\Actors\Components\Pickable.cs" />
+    <Compile Include="Engine\Engine.cs" />
+    <Compile Include="Engine\Generators\ActorGenerator.cs" />
+    <Compile Include="Engine\Generators\CaveGenerator.cs" />
+    <Compile Include="Engine\Generators\DungeonGenerator.cs" />
+    <Compile Include="Engine\GUI\Gui.cs" />
+    <Compile Include="Engine\GUI\ContainerGui.cs" />
+    <Compile Include="Engine\GUI\DefeatGui.cs" />
+    <Compile Include="Engine\GUI\LoadingGui.cs" />
+    <Compile Include="Engine\GUI\MessageGui.cs" />
+    <Compile Include="Engine\Lang.cs" />
+    <Compile Include="Engine\Level.cs" />
+    <Compile Include="Engine\Map.cs" />
+    <Compile Include="Engine\Generators\MapGenerator.cs" />
+    <Compile Include="Engine\Message.cs" />
+    <Compile Include="Engine\Player.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="References\ActorLoader.cs" />
+    <Compile Include="Tools\Commands.cs" />
+    <Compile Include="Tools\fastJSON\dynamic.cs" />
+    <Compile Include="Tools\fastJSON\Formatter.cs" />
+    <Compile Include="Tools\fastJSON\Getters.cs" />
+    <Compile Include="Tools\fastJSON\JSON.cs" />
+    <Compile Include="Tools\fastJSON\JsonParser.cs" />
+    <Compile Include="Tools\fastJSON\JsonSerializer.cs" />
+    <Compile Include="Tools\fastJSON\Reflection.cs" />
+    <Compile Include="Tools\fastJSON\SafeDictionary.cs" />
+    <Compile Include="Tools\ObjectCopier.cs" />
+    <Compile Include="Tools\Raw.cs" />
+    <Compile Include="Tools\Saver.cs" />
+    <Compile Include="Tools\TargetSelector.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\data\config\" />
+    <Folder Include="bin\Debug\data\saves\" />
+    <Folder Include="Engine\Actors\Components\Effects\Pickables\" />
+    <Folder Include="Tools\fastJSON\Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

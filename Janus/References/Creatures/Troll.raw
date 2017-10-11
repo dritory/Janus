@@ -1,0 +1,7 @@
+[Name:troll]
+[Char:T]
+[Color:green]
+[Component:DestructibleMonster:50:3:dead troll]
+[Component:Attacker:10]
+[Component:MonsterAI]
+
