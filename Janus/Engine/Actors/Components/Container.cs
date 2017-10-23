@@ -14,7 +14,15 @@ namespace Janus.Engine.Components {
         }
         public Container(Actor owner, string[] s)
             : base(owner) {
+            if (s.Length > 0)
                 this.size = int.Parse(s[0]);
+            if(s.Length > 1)
+            {
+                Actor a = ActorLoader.getActor(s[1]);
+                if (a != null)
+                    inventory.Add(a);
+            }
+
         }
         public bool add(Actor actor) {
             if (size > 0 && inventory.Count >= size) {

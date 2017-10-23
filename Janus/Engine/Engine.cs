@@ -23,7 +23,7 @@ namespace Janus.Engine
 
 
 
-        
+
         public GUI.Gui gui;
         public GUI.MessageGui messageGui;
         public GUI.ContainerGui containerGui;
@@ -52,14 +52,12 @@ namespace Janus.Engine
 
             Console.WriteLine("Initializing...");
             gameStatus = GameStatus.LOADING;
-            TCODConsole.initRoot(screenWidth, screenHeight, "JanusRT", false);
+            TCODConsole.initRoot(screenWidth, screenHeight, "Janus Roguelike", false);
 
             TCODMouse.showCursor(true);
 
-            player = new Player(this);
-            player.computeFov = true;
-            player.getDestructible().ressurect();
 
+            
             levels = new Dictionary<int, Level>();
 
             gui = new GUI.Gui();
@@ -74,18 +72,23 @@ namespace Janus.Engine
             levels.Add(0, currentLevel);
             changeLevel(0);
 
+            player = new Player(this);
+            player.getDestructible().ressurect();
+
             player.x = map.startx; //assign player position
             player.y = map.starty;
+
+            player.fov.update();
 
             actorHandler.addActor(player);
 
             Saver.load();
-           
+
             Console.WriteLine("Initializing Complete");
-            
-            
+
+
             render();
-            
+
             lastKey = new TCODKey();
             gameStatus = GameStatus.STARTUP;
         }
@@ -104,21 +107,25 @@ namespace Janus.Engine
 
             key = TCODConsole.checkForKeypress((int)TCODKeyStatus.KeyPressed);
             debugCommands.update();
-            
-            if(gameStatus == GameStatus.LOADING)
+
+            if (gameStatus == GameStatus.LOADING)
             {
                 loadingGui.update();
             }
             else if (gameStatus == GameStatus.DEFEAT)
             {
-                defeatGui.update();
+                if (key.Pressed)
+                {
+                    Console.WriteLine("Restarting game...");
+                    initialize(true);
+
+                }
             }
             else
             {
-                if (gameStatus == GameStatus.STARTUP)
-                    currentLevel.map.computeFov();
-                gameStatus = GameStatus.IDLE;
                 
+                gameStatus = GameStatus.IDLE;
+
                 player.update();
                 gui.update();
                 messageGui.update();
@@ -135,30 +142,40 @@ namespace Janus.Engine
             lastKey = key;
         }
 
-        public void changeLevel (int number)
+        public void changeLevel(int number)
         {
-            if(levels.ContainsKey( number))
+            int lastLevel = levelnr;
+            if (levels.ContainsKey(number))
             {
                 levelnr = number;
                 currentLevel = levels[number];
+                map.updateFov = true;
+                if (player != null && gameStatus != GameStatus.STARTUP && gameStatus != GameStatus.LOADING)
+                {
+                    if (levels.ContainsKey(lastLevel))
+                        levels[lastLevel].actorHandler.actors.Remove(player);
+                    currentLevel.actorHandler.addActor(player);
+                    //player.fov.update();
+                }
             }
-            else if(levels.Count >0)//The level does not exist yet
+            else if (levels.Count > 0)//The level does not exist yet
             {
-                Level newLevel = generateLevel(number); //Generate new level
+                Level newLevel = new Level(number);
                 currentLevel = newLevel;
+                levelnr = number;
+                newLevel.initialize(levels.Count > 0); //Generate new level
                 levels.Add(number, newLevel);
+                if (levels.ContainsKey(lastLevel))
+                    levels[lastLevel].actorHandler.actors.Remove(player);
+                currentLevel.actorHandler.addActor(player);
                 player.x = map.startx; //assign player position
                 player.y = map.starty;
+                map.updateFov = true;
+                player.fov.update();
             }
-        }
-        public Level generateLevel (int levelNr)
-        {
-            Level newLevel = new Level(levelNr);
             
-            newLevel.initialize(levels.Count > 0);
-
-            return newLevel;
         }
+       
         public void render()
         {
             render(true);
@@ -166,8 +183,9 @@ namespace Janus.Engine
         public void render(bool flush)
         {
 
-            TCODConsole.root.clear();
 
+
+            TCODConsole.root.clear();
             if (gameStatus == GameStatus.LOADING)
             {
                 loadingGui.render();
@@ -180,8 +198,8 @@ namespace Janus.Engine
             else
             {
                 currentLevel.render();
-               if(player != null)
-                player.render();
+                if (player != null)
+                    player.render();
                 if (player != null)
                     TCODConsole.root.print(1, screenHeight - 2, string.Format("HP : {0}/{1}",
         (int)player.getDestructible().hp, (int)player.getDestructible().maxHp));
@@ -189,7 +207,7 @@ namespace Janus.Engine
                 messageGui.render();
                 containerGui.render();
 
-                
+
             }
             TCODConsole.flush();
         }

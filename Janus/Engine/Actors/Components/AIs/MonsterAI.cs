@@ -39,6 +39,9 @@ namespace Janus.Engine.Components {
             
             float distance = (float)Math.Sqrt(dx * dx + dy * dy);
             if (distance >= 2) {
+                Fov fov = (Fov)owner.getComponent(typeof(Fov));
+                if (fov != null)
+                    fov.updateFov();
                 dx = (int)(Math.Round(dx / distance));
                 dy = (int)(Math.Round(dy / distance));
                 if (Program.engine.map.canWalk(owner.x + dx, owner.y + dy)) {
@@ -66,7 +69,7 @@ namespace Janus.Engine.Components {
                 {
                     return;
                 }
-                if (Program.engine.map.isInFov(owner.x, owner.y))
+                if (Program.engine.player.fov.isInFov(owner.x, owner.y))
                 {
                     // we can see the player. move towards him
                     moveCount = TRACKING_TURNS;

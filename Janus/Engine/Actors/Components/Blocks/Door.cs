@@ -8,6 +8,7 @@ namespace Janus.Engine.Components.Blocks
     class Door : Component
     {
         public bool open = false;
+        private bool oldState = false;
         public bool transparent = false;
         public Door(Actor owner, string [] s)
             : base(owner)
@@ -36,7 +37,8 @@ namespace Janus.Engine.Components.Blocks
                 ^ (Program.engine.map.isWall(owner.x, owner.y - 1) && Program.engine.map.isWall(owner.x, owner.y + 1))))
             {
                     Program.engine.map.setWall(owner.x, owner.y);
-                    owner.destroy();
+                    Program.engine.map.updateFov = true;
+                     owner.destroy();
             }
         }
 
@@ -63,21 +65,28 @@ namespace Janus.Engine.Components.Blocks
                     oldX = owner.x;
                     oldY = owner.y;
                 }
-                
-                if (open)
+
+                if (open != oldState)
                 {
-                    if (owner.chs != null && owner.chs.Length > 1)
-                        owner.ch = owner.chs[1];
-                    owner.blocks = false;
-                    Program.engine.map.map.setProperties(owner.x, owner.y, true, !Program.engine.map.isWall(owner.x, owner.y));
+                    if (open)
+                    {
+                        if (owner.chs != null && owner.chs.Length > 1)
+                            owner.ch = owner.chs[1];
+                        owner.blocks = false;
+                        Program.engine.map.map.setProperties(owner.x, owner.y, true, !Program.engine.map.isWall(owner.x, owner.y));
+                        Program.engine.map.updateFov = true;
+                    }
+                    else
+                    {
+                        if (owner.chs != null)
+                            owner.ch = owner.chs[0];
+                        owner.blocks = true;
+                        Program.engine.map.map.setProperties(owner.x, owner.y, transparent, !Program.engine.map.isWall(owner.x, owner.y));
+                        Program.engine.map.updateFov = true;
+                    }
                 }
-                else
-                {
-                    if (owner.chs != null)
-                        owner.ch = owner.chs[0];
-                    owner.blocks = true;
-                    Program.engine.map.map.setProperties(owner.x, owner.y, transparent, !Program.engine.map.isWall(owner.x, owner.y));
-                }
+
+                oldState = open;
             }
             else
                 checkIfValid();

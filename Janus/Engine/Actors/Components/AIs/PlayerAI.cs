@@ -71,6 +71,7 @@ namespace Janus.Engine.Components
 
             if (player.isDead())
             {
+                player.getDestructible().die(player);
                 return;
             }
 
@@ -144,26 +145,26 @@ namespace Janus.Engine.Components
                     if (x != 0 || y != 0)
                         if (moveOrAttack(player, player.x + x, player.y + y))
                         {
-                            player.computeFov = true;
+                            player.fov.updateFov();
                             if (player.x - Program.engine.map.offsetX - Program.engine.map.renderX < MAX_LENGTH_TO_MAP_EDGE)
                             {
                                 Program.engine.map.offsetX -= MAX_LENGTH_TO_MAP_EDGE - 1;
-
+                                Program.engine.map.updateFov = true;
                             }
                             if (player.y - Program.engine.map.offsetY - Program.engine.map.renderY < MAX_LENGTH_TO_MAP_EDGE)
                             {
                                 Program.engine.map.offsetY -= MAX_LENGTH_TO_MAP_EDGE - 1;
-
+                                Program.engine.map.updateFov = true;
                             }
                             if (player.x - Program.engine.map.offsetX - Program.engine.map.renderX > Program.engine.map.renderWidth - MAX_LENGTH_TO_MAP_EDGE)
                             {
                                 Program.engine.map.offsetX += MAX_LENGTH_TO_MAP_EDGE - 1;
-
+                                Program.engine.map.updateFov = true;
                             }
                             if (player.y - Program.engine.map.offsetY - Program.engine.map.renderY > Program.engine.map.renderHeight - MAX_LENGTH_TO_MAP_EDGE)
                             {
                                 Program.engine.map.offsetY += MAX_LENGTH_TO_MAP_EDGE - 1;
-
+                                Program.engine.map.updateFov = true;
                             }
                         }
                         else
@@ -244,6 +245,7 @@ namespace Janus.Engine.Components
                                             {
                                                 door.open = true;
                                                 door.update(false);
+                                                nextTurn = true;
                                             }
                                             else
                                             {
@@ -267,7 +269,7 @@ namespace Janus.Engine.Components
                                             door.lockedLevel = 0;
                                             door.open = false;
                                             door.update(false);
-
+                                            nextTurn = true;
                                         }
 
 
@@ -379,7 +381,10 @@ namespace Janus.Engine.Components
                 if (dig)
                 {
                     if (targetx < Program.engine.map.width - 1 && targety < Program.engine.map.height - 1 && targetx > 1 && targety > 1)
+                    {
                         Program.engine.map.dig(targetx, targety, targetx, targety);
+                        Program.engine.map.updateFov = true;
+                    }
                     else if (!noclip)
                         return false;
                 }
@@ -425,7 +430,8 @@ namespace Janus.Engine.Components
                                 if (door.lockedLevel == 0)
                                 {
                                     door.open = true;
-
+                                    Program.engine.map.updateFov = true;
+                                   
                                 }
                                 else
                                 {

@@ -5,26 +5,26 @@ using System.Text;
 using libtcod;
 namespace Janus.Engine.Generators
 {
-    
+
     class MapGenerator
     {
         public Level level;
-        public Map map { get{ return level.map; } }
+        public Map map { get { return level.map; } }
         public DungeonGenerator dungeonGenerator;
         public CaveGenerator caveGenerator;
         public MapGenerator(Level level)
         {
             this.level = level;
         }
-        public void resetMap (bool walls)
+        public void resetMap(bool walls)
         {
             for (int x = 0; x < map.width; x++)
                 for (int y = 0; y < map.height; y++)
                 {
-                    
+
                     map.tiles[x, y].canWalk = !walls;
                     if (map.showAllTiles == true)
-                        map.tiles[x, y].memory = -1;
+                        map.tiles[x, y].explored = true;
                     map.tiles[x, y].tileID = "wall";
                     map.map.setProperties(x, y, !walls, !walls);
                 }
@@ -34,9 +34,9 @@ namespace Janus.Engine.Generators
         {
 
             resetMap(true);
-           
-           //caveGenerator = new CaveGenerator(map);
-           dungeonGenerator = new DungeonGenerator(level);
+
+            //caveGenerator = new CaveGenerator(map);
+            dungeonGenerator = new DungeonGenerator(level);
 
             for (int x = 0; x < map.width; x++)
             {
@@ -51,8 +51,8 @@ namespace Janus.Engine.Generators
 
             for (int i = 0; i < map.rooms.Count; i++)
             {
-               Room room = map.rooms[i];
-               createRoom(room.type, room.bounds.X, room.bounds.Y, room.bounds.X + room.bounds.Width, room.bounds.Y + room.bounds.Height);
+                Room room = map.rooms[i];
+                createRoom(room.type, room.bounds.X, room.bounds.Y, room.bounds.X + room.bounds.Width, room.bounds.Y + room.bounds.Height);
             }
 
 
@@ -74,7 +74,7 @@ namespace Janus.Engine.Generators
             return null;
         }
 
-        
+
         public Actor addDoor(int x, int y, bool open)
         {
             TCODRandom rng = TCODRandom.getInstance();
@@ -107,7 +107,7 @@ namespace Janus.Engine.Generators
             if (stair != null)
             {
                 Components.Blocks.Portal portal = (Components.Blocks.Portal)stair.getComponent(typeof(Components.Blocks.Portal));
-                if(portal != null)
+                if (portal != null)
                 {
                     portal.nextLevelNumber = portal.levelNumber + deltaLevels;
                 }
@@ -118,33 +118,18 @@ namespace Janus.Engine.Generators
 
 
 
-        public void addItem(int x, int y)
+        public void addRandomActorOfType(int x, int y, string type)
         {
-            TCODRandom rng = TCODRandom.getInstance();
-            if (rng.getInt(0, 100) < 50)
+            Actor a = ActorGenerator.getRandomActorOfType(type);
+            if (a != null)
             {
-                Actor rock = ActorLoader.getActor("rock");
-                if (rock != null)
-                {
-                    rock.x = x;
-                    rock.y = y;
-                    level.actorHandler.addActor(rock);
-                    level.actorHandler.sendToBack(rock);
-                }
-            }
-            else
-            {
-                Actor potion = ActorLoader.getActor("Healing Potion");
-                if (potion != null)
-                {
-                    potion.x = x;
-                    potion.y = y;
-                    level.actorHandler.addActor(potion);
-                    level.actorHandler.sendToBack(potion);
-                }
+                a.x = x;
+                a.y = y;
+                level.actorHandler.addActor(a);
+                level.actorHandler.sendToBack(a);
             }
         }
-        
+
         public void addMonster(int x, int y)
         {
             TCODRandom rng = TCODRandom.getInstance();
@@ -216,7 +201,7 @@ namespace Janus.Engine.Generators
                 {
                     map.offsetY += 10;
                 }
-
+                addActor(map.startx + 2, map.starty, "Torch");
                 addPortal(map.startx, map.starty, 1);
 
             }
@@ -225,7 +210,7 @@ namespace Janus.Engine.Generators
                 addPortal(x1 + ((x2 - x1) / 2), y1 + ((y2 - y1) / 2), -1);
             }
             else
-            { 
+            {
                 TCODRandom rng = TCODRandom.getInstance();
                 int nbMonsters = rng.getInt(0, DungeonGenerator.ROOM_MAX_MONSTERS);
                 while (nbMonsters > 0)
@@ -234,7 +219,7 @@ namespace Janus.Engine.Generators
                     int y = rng.getInt(y1, y2);
                     if (map.canWalk(x, y))
                     {
-                        addMonster(x, y);
+                        addRandomActorOfType(x, y, "creature*");
                     }
                     nbMonsters--;
                 }
@@ -245,7 +230,7 @@ namespace Janus.Engine.Generators
                     int y = rng.getInt(y1, y2);
                     if (map.canWalk(x, y))
                     {
-                        addItem(x, y);
+                        addRandomActorOfType(x, y,"items*");
                     }
                     nbItems--;
                 }

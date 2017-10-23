@@ -26,8 +26,14 @@ namespace Janus.Engine {
            
         }
         public virtual void update(bool validate) {
+            if(!validate)
+                this.update();
         }
-
+        public virtual void render(bool inSight)
+        {
+            if(inSight)
+                this.render();
+        }
         public virtual void render() {
         }
     }

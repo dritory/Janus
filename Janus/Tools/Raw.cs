@@ -115,8 +115,8 @@ static class Raw
             {
                 try
                 {
-                    string s = "JanusRT.Engine.Components.Effects." + values[0];
-                    Type effType = Type.GetType("JanusRT.Engine.Components.Effects." + values[0], true);
+                    string s = "Janus.Engine.Components.Effects." + values[0];
+                    Type effType = Type.GetType("Janus.Engine.Components.Effects." + values[0], true);
 
                     if (effType != null)
                     {
@@ -152,14 +152,14 @@ static class Raw
             {
                 try
                 {
-                    Type compType = Type.GetType("JanusRT.Engine.Components." + values[0], false);
+                    Type compType = Type.GetType("Janus.Engine.Components." + values[0], false);
 
                     if (compType == null)
-                        compType = Type.GetType("JanusRT.Engine.Components.AIs." + values[0], false);
+                        compType = Type.GetType("Janus.Engine.Components.AIs." + values[0], false);
                     if (compType == null)
-                        compType = Type.GetType("JanusRT.Engine.Components.Blocks." + values[0], false);
+                        compType = Type.GetType("Janus.Engine.Components.Blocks." + values[0], false);
                     if (compType == null)
-                        compType = Type.GetType("JanusRT.Engine.Components.Pickables." + values[0], true);
+                        compType = Type.GetType("Janus.Engine.Components.Pickables." + values[0], true);
                     if (compType != null)
                     {
                         try
@@ -204,27 +204,32 @@ static class Raw
                     }
                 case "Char":
                     {
+                        try{
+                            int ch = 0;
+                            if (int.TryParse(values[0], out ch))
+                                actor.ch = ch;
+                            else
+                                actor.ch = char.ConvertToUtf32(values[0].ToString(), 0);
 
-                        int ch = 0;
-                        if (int.TryParse(values[0], out ch))
-                            actor.ch = ch;
-                        else
-                            actor.ch = char.ConvertToUtf32(values[0].ToString(), 0);
-
-                        if (values.Length > 1)
-                        {
-                            actor.chs = new int[values.Length];
-                            for (int i = 0; i < values.Length; i++)
+                            if (values.Length > 1)
                             {
-
-                                if (int.TryParse(values[i], out ch))
+                                actor.chs = new int[values.Length];
+                                for (int i = 0; i < values.Length; i++)
                                 {
-                                    actor.chs[i] = ch;
 
+                                    if (int.TryParse(values[i], out ch))
+                                    {
+                                        actor.chs[i] = ch;
+
+                                    }
+                                    else
+                                        actor.chs[i] = char.ConvertToUtf32(values[i].ToString(), 0);
                                 }
-                                else
-                                    actor.chs[i] = char.ConvertToUtf32(values[i].ToString(), 0);
                             }
+                        }
+                        catch (IndexOutOfRangeException e)
+                        {
+                            Console.WriteLine(e.Message);
                         }
 
                         break;
@@ -262,7 +267,7 @@ static class Raw
                 case "Rarity":
                     {
                         if (values.Length > 0)
-                            actor.rarity = int.Parse(values[0]);
+                            actor.rarity = float.Parse(values[0]);
                         else
                         {
                             actor.rarity = 0;

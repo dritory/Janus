@@ -24,7 +24,7 @@ namespace Janus
             {
                 
                 engine.update();
-                    engine.render();
+                engine.render();
 
                
             }

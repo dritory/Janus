@@ -30,16 +30,9 @@ namespace Janus.Engine
 
         private ActorHandler actorHandler;
 
-        public int rarity;
+        public float rarity;
 
-        public int LogRarity
-        {
-            get { return 2 ^ (rarity); }
-
-            set { rarity = (int)Math.Log(value, 2); }
-
-        }
-
+        
         public string name;
         public string pluralName;
 
@@ -161,23 +154,38 @@ namespace Janus.Engine
         }
         public virtual void render()
         {
+            this.render(true);
+        }
 
-            if (x - Program.engine.map.offsetX > Program.engine.map.renderX && y - Program.engine.map.offsetY > Program.engine.map.renderY)
-                if (x - Program.engine.map.offsetX < Program.engine.map.renderWidth && y - Program.engine.map.offsetY < Program.engine.map.renderHeight)
+
+        public virtual void render(bool inSight)
+        {
+            if (inSight)
+            {
+                if (x - Program.engine.map.offsetX > Program.engine.map.renderX && y - Program.engine.map.offsetY > Program.engine.map.renderY)
+                    if (x - Program.engine.map.offsetX < Program.engine.map.renderWidth && y - Program.engine.map.offsetY < Program.engine.map.renderHeight)
+                    {
+                        TCODConsole.root.setChar(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, ch);
+                        if (color != null)
+                            TCODConsole.root.setCharForeground(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, color);
+                        else
+                        {
+                            Console.WriteLine("Color of " + this.name + " was null");
+                            TCODConsole.root.setCharForeground(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, TCODColor.white);
+                        }
+                        foreach (Component c in components)
+                        {
+                            c.render(true);
+                        }
+                    }
+            }
+            else
+            {
+                foreach (Component c in components)
                 {
-                    TCODConsole.root.setChar(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, ch);
-                    if (color != null)
-                        TCODConsole.root.setCharForeground(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, color);
-                    else
-                    {
-                        Console.WriteLine("Color of " + this.name + " was null");
-                        TCODConsole.root.setCharForeground(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, TCODColor.white);
-                    }
-                    foreach (Component c in components)
-                    {
-                        c.render();
-                    }
+                    c.render(true);
                 }
+            }
         }
     }
 }

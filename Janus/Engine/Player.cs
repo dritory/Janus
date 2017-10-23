@@ -13,7 +13,7 @@ namespace Janus.Engine {
         public DestructiblePlayer(Player player,float maxHp, float defense, string corpseName, float healingRate)
             : base(player, maxHp, defense, corpseName, healingRate)
         {
-            
+            hp = maxHp;
         }
         public override void die(Actor owner) {
             Message.WriteLine ("You died!");
@@ -28,10 +28,9 @@ namespace Janus.Engine {
 
        
         public int fovRadius = 25;
-        public bool computeFov = true;
         private Engine engine;
         private Components.PlayerAI playerAi;
-        
+        public Components.Fov fov;
 
         public Player(Engine engine)
             : base(0, 40, 25, '@', TCODColor.white) {
@@ -40,7 +39,8 @@ namespace Janus.Engine {
             this.components.Add(new Components.Attacker(this,5));
             this.components.Add(new Components.PlayerAI(this));
             this.components.Add(new Components.Container(this, 26));
-            
+            fov = new Components.Fov(this, 25,50);
+            this.components.Add(fov);
             name = "you";
             this.engine = engine;
             this.playerAi = (Components.PlayerAI)getComponent(typeof(Components.PlayerAI));
@@ -56,19 +56,13 @@ namespace Janus.Engine {
             }
                 if (engine.gameStatus == GameStatus.NEW_TURN)
                 {
-                    if (computeFov)
-                    {
-
-                        engine.map.computeFov();
-                        computeFov = false;
-                    }
-
                     foreach (Component c in components)
                     {
                         if(c.GetType() != typeof(Components.PlayerAI))
                         c.update();
                     }
                 }
+           
         }
 
 

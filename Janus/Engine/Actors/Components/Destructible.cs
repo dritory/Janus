@@ -12,7 +12,7 @@ namespace Janus.Engine.Components {
 
 
         public float maxHp; // maximum health points
-        public float hp; // current health points
+        public float hp = 1; // current health points
         public float defense; // hit points deflected
         public string corpseName; // the actor's name once dead/destroyed
         public float healingRate = 0; //HP regenerated per turn 

@@ -69,12 +69,14 @@ namespace Janus.Engine.Generators
         public List<Point> junctions = new List<Point>();
 
         public int roomExtraSize = 1;
-        public int windingPercent = 50;
-        public int deadEndLength = 1;
+        public int windingPercent = 20;
+        public int deadEndLength = 3;
         public int roomTries;
-        public int maxRoomTries = 100;
-        public int minRoomTries = 5;
-        public int maxExtraJunctions = 20;
+
+        public int overlapPercent = 20;
+        public int maxRoomTries = 500;
+        public int minRoomTries = 100;
+        public int maxExtraJunctions = 30;
         public int roomNumber;
 
         public const int ROOM_MAX_SIZE = 11;
@@ -95,11 +97,12 @@ namespace Janus.Engine.Generators
             extraConnectorChance = rng.getInt(10, 100);
             regions = new int[map.width, map.height];
 
-            if(debugDraw)
+            if (debugDraw)
             {
                 map.showAllTiles = true;
 
                 Program.engine.update();
+                TCODConsole.root.clear();
                 TCODConsole.flush();
             }
 
@@ -120,6 +123,7 @@ namespace Janus.Engine.Generators
                 }
             }
             connectRegions();
+            addRandomJuctions();
             Program.engine.loadingGui.loading++;
             Program.engine.render();
             removeDeadEnds();
@@ -145,12 +149,6 @@ namespace Janus.Engine.Generators
                 //  Program.engine.update();
                 //  TCODConsole.flush();
 
-                if (debugDraw)
-                {
-                    Program.engine.render();
-
-                    TCODConsole.flush();
-                }
 
                 int size = rng.getInt(ROOM_MIN_SIZE, ROOM_MAX_SIZE + roomExtraSize);
                 if (rng.getInt(0, 1) == 0)
@@ -194,6 +192,7 @@ namespace Janus.Engine.Generators
                 Room room = new Room(x, y, width, height);
 
                 bool overlaps = false;
+                /*
                 for (int j = 0; j < map.rooms.Count; j++)
                 {
                     Rectangle b = new Rectangle(room.bounds.X - 1, room.bounds.Y - 1, room.bounds.Width + 1, room.bounds.Height + 1);
@@ -204,6 +203,7 @@ namespace Janus.Engine.Generators
                         break;
                     }
                 }
+                */
                 if (!overlaps)
                 {
                     int overlapNum = 0;
@@ -216,7 +216,7 @@ namespace Janus.Engine.Generators
                             }
 
                         }
-                    if (overlapNum > ((room.bounds.X + 2) * (room.bounds.Y + 2)) / 2)
+                    if (overlapPercent * overlapNum > (((room.bounds.X) * (room.bounds.Y)) / 100))
                         overlaps = true;
                 }
                 if (!overlaps)
@@ -234,18 +234,23 @@ namespace Janus.Engine.Generators
                     startRegion();
                     map.rooms.Add(room);
 
+                    if (debugDraw)
+                    {
+                        Program.engine.render();
+
+                        TCODConsole.flush();
+                    }
                     for (int a = room.bounds.X - 1; a < room.bounds.X + room.bounds.Width + 2; a++)
                         for (int b = room.bounds.Y - 1; b < room.bounds.Y + room.bounds.Height + 2; b++)
                         {
                             if (a < room.bounds.X || b < room.bounds.Y || a > room.bounds.X + room.bounds.Width || b > room.bounds.Y + room.bounds.Height)
                             {
-                                map.setWall(a, b);
+                                if (map.isWall(a, b))
+                                    map.setWall(a, b);
                             }
                             else
                                 carve(a, b);
                         }
-
-
                 }
 
             }
@@ -350,6 +355,7 @@ namespace Janus.Engine.Generators
                                     if (region != 0 && !regs.Contains(region))
                                         regs.Add(region);
                                 }
+
                             }
                         }
                         if (regs.Count < 2)
@@ -563,6 +569,26 @@ namespace Janus.Engine.Generators
 
 
         }
+
+        public void addRandomJuctions()
+        {
+            for (int y = 1; y < map.height - 1; y++)
+            {
+
+                for (int x = 1; x < map.width - 1; x++)
+                {
+                    if ((map.isWall(x - 1, y) && map.isWall(x + 1, y)) || map.isWall(x, y - 1) && map.isWall(x, y + 1))
+                    {
+                        int rand = TCODRandom.getInstance().getInt(0, 1000);
+                        if(rand > 1000 - (1000/ extraConnectorChance))
+                        {
+                            addJunction(x, y);
+                        }
+                    }
+                }
+            }
+        }
+
 
 
         public void addJunction(int x, int y)
@@ -864,14 +890,11 @@ namespace Janus.Engine.Generators
             bool done = false;
             int tries = 0;
             int l = 0;
-
-            int deadEnds = deadEndLength;
-
-            while (!done && !TCODConsole.isWindowClosed() && tries < 100 - deadEnds)
+            List<Point> ignores = new List<Point>();
+            while (!done && !TCODConsole.isWindowClosed() && tries < 100)
             {
                 // Program.engine.update();
                 //Program.engine.render();
-
                 //TCODConsole.flush();
                 if (debugDraw)
                 {
@@ -880,7 +903,6 @@ namespace Janus.Engine.Generators
                 }
                 done = true;
 
-                deadEnds = deadEndLength + TCODRandom.getInstance().getInt(-20, 20);
 
                 for (var y = 1; y < map.height; y += 1)
                 {
@@ -895,14 +917,19 @@ namespace Janus.Engine.Generators
                                 if (dir != Direction.NULL)
                                 {
                                     Point p = dirToPoint(dir);
-                                    if (!map.isWall(x + p.X, y + p.Y))
+                                    if (!map.isWall(x + p.X, y + p.Y) || ignores.Contains(new Point(x + p.X, y + p.Y)))
                                         exits.Add(p);
                                 }
                             }
                             if (exits.Count == 1)
                             {
-                                done = false;
-                                map.setWall(x, y);
+                                if (TCODRandom.getInstance().getInt(0, 100) < 100 - deadEndLength)
+                                {
+                                    done = false;
+                                    map.setWall(x, y);
+                                }
+                                else
+                                    ignores.Add(new Point(x, y));
                             }
 
                         }

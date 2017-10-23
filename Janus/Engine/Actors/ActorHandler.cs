@@ -20,10 +20,12 @@ namespace Janus.Engine
         }
         public void initialize(bool restarting)
         {
+            actors = new List<Actor>();
             if (!restarting)
             {
                 ActorLoader.getAllActorDirectories();
                 Generators.ActorGenerator.getReferenceActors();
+                
             }
         }
         public void update()
@@ -80,7 +82,7 @@ namespace Janus.Engine
             {
                 for (int cy = map.renderY; cy < map.renderHeight; cy++)
                 {
-                    if (map.isInFov(cx + map.offsetX, cy + map.offsetY)
+                    if (Program.engine.player.fov.isInFov(cx + map.offsetX, cy + map.offsetY)
                         && (maxRange == 0 || Program.engine.player.getDistance(cx + map.offsetX, cy + map.offsetY) <= maxRange))
                     {
                         TCODColor col = TCODConsole.root.getCharBackground(cx, cy);
@@ -100,7 +102,7 @@ namespace Janus.Engine
                 Program.engine.key = TCODConsole.checkForKeypress((int)TCODKeyStatus.KeyPressed);
                 if (Engine.useMouse)
                 {
-                    if (map.isInFov(mousedata.CellX + map.offsetX, mousedata.CellY + map.offsetY))
+                    if (Program.engine.player.fov.isInFov(mousedata.CellX + map.offsetX, mousedata.CellY + map.offsetY))
                         if ((maxRange == 0 || Program.engine.player.getDistance(mousedata.CellX + map.offsetX, mousedata.CellY + map.offsetY) <= maxRange))
                         {
                             pickX = mousedata.CellX;
@@ -127,7 +129,7 @@ namespace Janus.Engine
                     oldX = pickX;
                     oldY = pickY;
                 }
-                if (map.isInFov(pickX + map.offsetX, pickY + map.offsetY))
+                if (Program.engine.player.fov.isInFov(pickX + map.offsetX, pickY + map.offsetY))
                     if ((maxRange == 0 || Program.engine.player.getDistance(pickX + map.offsetX, pickY + map.offsetY) <= maxRange))
                     {
 
@@ -142,23 +144,23 @@ namespace Janus.Engine
                                 }
                             case TCODKeyCode.Up:
                                 {
-                                    if (map.isInFov(pickX + map.offsetX, pickY - 1 + map.offsetY))
+                                    if (Program.engine.player.fov.isInFov(pickX + map.offsetX, pickY - 1 + map.offsetY))
                                         if (Program.engine.player.getDistance(pickX + map.offsetX, pickY - 1 + map.offsetY) <= maxRange)
                                             pickY--;
                                     break;
                                 }
                             case TCODKeyCode.Down:
-                                if (map.isInFov(pickX + map.offsetX, pickY + 1 + map.offsetY))
+                                if (Program.engine.player.fov.isInFov(pickX + map.offsetX, pickY + 1 + map.offsetY))
                                     if (Program.engine.player.getDistance(pickX + map.offsetX, pickY + 1 + map.offsetY) <= maxRange)
                                         pickY++;
                                 break;
                             case TCODKeyCode.Left:
-                                if (map.isInFov(pickX - 1 + map.offsetX, pickY + map.offsetY))
+                                if (Program.engine.player.fov.isInFov(pickX - 1 + map.offsetX, pickY + map.offsetY))
                                     if (Program.engine.player.getDistance(pickX - 1 + map.offsetX, pickY + map.offsetY) <= maxRange)
                                         pickX--;
                                 break;
                             case TCODKeyCode.Right:
-                                if (map.isInFov(pickX + 1 + map.offsetX, pickY + map.offsetY))
+                                if (Program.engine.player.fov.isInFov(pickX + 1 + map.offsetX, pickY + map.offsetY))
                                     if (Program.engine.player.getDistance(pickX + 1 + map.offsetX, pickY + map.offsetY) <= maxRange)
                                         pickX++;
                                 break;
@@ -177,8 +179,11 @@ namespace Janus.Engine
 
         public void addActor(Actor actor)
         {
+           
             actor.setActorHandler(this);
             actors.Add(actor);
+            if (actor.blocks)
+                map.updateFov = true;
         }
 
 
@@ -236,12 +241,14 @@ namespace Janus.Engine
         {
             foreach (Actor actor in actors)
             {
-                if (map.isInFov(actor.x, actor.y) &&
+                if (Program.engine.player.fov.isInFov(actor.x, actor.y) &&
                     actor.x < map.renderWidth + Program.engine.currentLevel.map.offsetX &&
                     actor.y < map.renderHeight + Program.engine.currentLevel.map.offsetY &&
                     actor.x > Program.engine.currentLevel.map.offsetX &&
                     actor.y > Program.engine.currentLevel.map.offsetY)
-                    actor.render();
+                    actor.render(true);
+                else
+                    actor.render(false);
             }
         }
     }

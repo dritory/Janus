@@ -119,18 +119,14 @@ namespace Janus.Engine.Components.Blocks
                 {
                     if (nextLevelNumber != levelNumber) //actor needs to be transported over multible levels
                     {
-                        if (!Program.engine.levels.ContainsKey(nextLevelNumber))
-                        {
-                            Program.engine.levels.Add(nextLevelNumber, Program.engine.generateLevel(nextLevelNumber));
-                        }
-
-                        Program.engine.actorHandler.actors.Remove(activator);
-                        Program.engine.levels[nextLevelNumber].actorHandler.addActor(activator);
+                       
 
                         if (activator == Program.engine.player)
                         {
                             Program.engine.changeLevel(nextLevelNumber);
                         }
+                        Program.engine.levels[levelNumber].actorHandler.actors.Remove(activator);
+                        Program.engine.levels[nextLevelNumber].actorHandler.addActor(activator);
 
                     }
                     activator.setActorHandler(Program.engine.actorHandler);
@@ -142,18 +138,16 @@ namespace Janus.Engine.Components.Blocks
             {
                 if (nextLevelNumber != levelNumber) //next actor does not exist
                 {
-                    if (!Program.engine.levels.ContainsKey(nextLevelNumber))
-                    {
-                        Program.engine.levels.Add(nextLevelNumber, Program.engine.generateLevel(nextLevelNumber));
-                    }
-                    Level level = Program.engine.levels[nextLevelNumber];
-                    Program.engine.actorHandler.actors.Remove(activator);
-                    level.actorHandler.addActor(activator);
 
                     if (activator == Program.engine.player)
                     {
                         Program.engine.changeLevel(nextLevelNumber);
                     }
+                    Level level = Program.engine.levels[nextLevelNumber];
+                    Program.engine.levels[levelNumber].actorHandler.actors.Remove(activator);
+                    level.actorHandler.addActor(activator);
+
+                    
 
                     activator.x = level.map.startx;
                     activator.y = level.map.starty;

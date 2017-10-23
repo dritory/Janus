@@ -18,19 +18,10 @@ namespace Janus.Tools
         }
         public void update()
         {
-            if (engine.gameStatus == GameStatus.DEFEAT)
-            {
-                if (engine.key.Pressed)
-                {
-                    Console.WriteLine("Restarting game...");
-                    engine.initialize(true);
-
-                }
-            }
-            else
+           if (engine.gameStatus == GameStatus.STARTUP || engine.gameStatus == GameStatus.IDLE)
             {
                 if (engine.gameStatus == GameStatus.STARTUP)
-                    engine.map.computeFov();
+                    engine.player.fov.computeFov();
                 engine.gameStatus = GameStatus.IDLE;
 
                 if (engine.key.Character == '|' || engine.key.Character == '`')
@@ -72,6 +63,7 @@ namespace Janus.Tools
                             {
                                 Console.WriteLine("Generating Map...");
                                 engine.map.generate();
+                                engine.gameStatus = GameStatus.STARTUP;
                                 break;
                             }
                         case "kill":

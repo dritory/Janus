@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="bin\Debug\data\items\potions\Potion_health.raw" />
+    <None Include="bin\Debug\data\items\potions\Potion_lesser_health.raw" />
     <None Include="Content\font.ttf" />
     <None Include=".DS_Store" />
     <None Include="libSDL.so" />
@@ -82,10 +82,12 @@
     <Content Include="bin\Debug\data\blocks\Door_wood.raw" />
     <Content Include="bin\Debug\data\blocks\Granite.raw" />
     <Content Include="bin\Debug\data\blocks\Stair.raw" />
+    <Content Include="bin\Debug\data\blocks\Torch.raw" />
     <Content Include="bin\Debug\data\creatures\Kobold.raw" />
     <Content Include="bin\Debug\data\creatures\Raw.raw" />
     <Content Include="bin\Debug\data\creatures\Orc.raw" />
     <Content Include="bin\Debug\data\creatures\Troll.raw" />
+    <None Include="bin\Debug\data\items\potions\Potion_great_health.raw" />
     <Content Include="bin\Debug\data\items\Rock_throwable.raw" />
     <Content Include="Content\curses_640x300.bmp" />
     <Content Include="Content\curses_640x300.png" />
@@ -175,6 +177,7 @@
     <Compile Include="Engine\Actors\Components\Effects\HealthEffect.cs" />
     <Compile Include="Engine\Actors\Components\Pickable.cs" />
     <Compile Include="Engine\Engine.cs" />
+    <Compile Include="Engine\Actors\Components\Fov.cs" />
     <Compile Include="Engine\Generators\ActorGenerator.cs" />
     <Compile Include="Engine\Generators\CaveGenerator.cs" />
     <Compile Include="Engine\Generators\DungeonGenerator.cs" />

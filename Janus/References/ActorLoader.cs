@@ -46,7 +46,7 @@ namespace Janus
             string[] dirs = Directory.GetDirectories(mainDir,"*",SearchOption.AllDirectories);
             for (int i = 0; i < dirs.Length; i++)
             {
-                string dir = dirs[i].Remove(0, (Directory.GetCurrentDirectory() + Engine.Engine.MAINDIRECTORY).Length + 1);
+                string dir = dirs[i].Remove(0, (Directory.GetCurrentDirectory() + Engine.Engine.MAINDIRECTORY).Length + 1).ToLower();
                 if (!dir.Contains("data\\saves"))
                 {
                     string[] files = Directory.GetFiles(mainDir +"\\"+ dir );
@@ -58,8 +58,8 @@ namespace Janus
                             if (!actorDirectories.ContainsKey(a.name.ToLower()))
                                 actorDirectories.Add(a.name.ToLower(), files[j]);
 
-
-
+                            dir = dir.Replace('\\', ':');
+                            dir = dir.Replace('/', ':');
                             if (!actorDirectoriesByType.ContainsKey(dir))
                                 actorDirectoriesByType.Add(dir, new Dictionary<string, string>());
 

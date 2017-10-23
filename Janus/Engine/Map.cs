@@ -16,11 +16,13 @@ namespace Janus.Engine
             this.canWalk = canWalk;
             //this.explored = explored;
             this.tileID = tileID;
-            this.memory = 0;
+            this.explored = false;
+            this.light = 0;
         }
         public bool canWalk; // can we walk through this tile?
         // public bool explored; //has been explored?
-        public int memory;
+        public bool explored;
+        public byte light;
         public string tileID;
 
     };
@@ -31,7 +33,7 @@ namespace Janus.Engine
     {
 
         public int maxPlayerMemory = 100;
-        public int minPlayerMemory = 20;
+        public int minPlayerMemory = 10;
         public bool showAllTiles = false;
 
 
@@ -47,6 +49,8 @@ namespace Janus.Engine
         public int renderX, renderY;
         public int offsetX;
         public int offsetY;
+
+        public bool updateFov;
 
         private static Engine engine = Program.engine;
         private Level level;
@@ -69,10 +73,10 @@ namespace Janus.Engine
 
         }
 
-        static TCODColor darkWall = new TCODColor(5, 5, 30);
-        static TCODColor darkGround = new TCODColor(40, 40, 60);
-        static TCODColor lightWall = new TCODColor(60, 60, 80);
-        static TCODColor lightGround = new TCODColor(120, 120, 140);
+        public static TCODColor darkWall = new TCODColor(20, 20,20);
+        public static TCODColor darkGround = new TCODColor(50, 50,50);
+        public static TCODColor lightWall = new TCODColor(60, 60, 80);
+        public static TCODColor lightGround = new TCODColor(120, 120, 140);
         #region methods
         public void generate()
         {
@@ -82,14 +86,13 @@ namespace Janus.Engine
             tiles = new Tile[width, height];
             map = new TCODMap(width, height);
             level.actorHandler.actors = new List<Actor>();
-            
+
 
             Message.lines = new List<Line>();
             rooms = new List<Generators.Room>();
             generator = new Generators.MapGenerator(level);
             generator.generate();
-            generator.debugRender();
-            
+            updateFov = true;
             Console.WriteLine("..Succeed!");/*
             TCODConsole console = new TCODConsole(width, height);
             console.clear();
@@ -118,10 +121,18 @@ namespace Janus.Engine
         public bool isExplored(int x, int y)
         {
             if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
-                return tiles[x, y].memory != 0;
+                return tiles[x, y].explored;
             else
                 return false;
         }
+        public byte getLight(int x, int y)
+        {
+            if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
+                return tiles[x, y].light;
+            else
+                return 0;
+        }
+
         public bool isWall(int x, int y)
         {
             return !map.isWalkable(x, y);
@@ -130,31 +141,7 @@ namespace Janus.Engine
         {
             map.setProperties(x, y, false, false);
         }
-        public bool isInFov(int x, int y)
-        {
-            if (x < 0 || x >= width || y < 0 || y >= height)
-            {
-                return false;
-            }
-            if (map.isInFov(x, y))
-            {
-                tiles[x, y].memory = maxPlayerMemory;
-                return true;
-            }
-            return false;
-        }
-        public bool isInTorchFov(int x, int y)
-        {
-            if (x < renderX || x  >= renderWidth || y  < renderY || y  >= renderHeight)
-            {
-                return false;
-            }
-            if (torchMap.isInFov(x, y))
-            {
-                return true;
-            }
-            return false;
-        }
+
         public bool canWalk(int x, int y)
         {
             if (isWall(x, y))
@@ -169,18 +156,6 @@ namespace Janus.Engine
             return true;
         }
 
-
-        public void computeFov()
-        {
-            if (engine.player.x >= 0 && engine.player.x < tiles.GetLength(0) && engine.player.y >= 0 && engine.player.y < tiles.GetLength(1))
-                map.computeFov(engine.player.x, engine.player.y, engine.player.fovRadius, true, TCODFOVTypes.ShadowFov);
-            //computeTorchFov();
-        }
-        public void computeTorchFov()
-        {
-            if (engine.player.x + offsetX >= 0 && engine.player.x + offsetX < tiles.GetLength(0) && engine.player.y + offsetY >= 0 && engine.player.y + offsetY < tiles.GetLength(1))
-                torchMap.computeFov(engine.player.x+ offsetX, engine.player.y + offsetY, engine.player.fovRadius, true, TCODFOVTypes.Permissive2Fov);
-        }
         public void dig(int x1, int y1, int x2, int y2)
         {
             if (x2 < x1)
@@ -223,14 +198,7 @@ namespace Janus.Engine
 
         public void update()
         {
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (tiles[x, y].memory > minPlayerMemory)
-                        tiles[x, y].memory--;
-                }
-            }
+
         }
 
         public void render()
@@ -243,79 +211,64 @@ namespace Janus.Engine
                 time = 0;
             }
             time++;
+
             for (int x = renderX; x < renderWidth; x++)
             {
                 for (int y = renderY; y < renderHeight; y++)
                 {
-
-                    if (isInFov(x + offsetX, y + offsetY))
+                    if (x + offsetX >= 0 && x + offsetX < tiles.GetLength(0) && y + offsetY >= 0 && y + offsetY < tiles.GetLength(1))
                     {
-                        
-                            if (engine.player.x >= 0 && engine.player.x < tiles.GetLength(0) && engine.player.y >= 0 && engine.player.y < tiles.GetLength(1))
-                                try
-                                {
-                                    double distance = Math.Sqrt(Math.Pow(Program.engine.player.x - (x + offsetX), 2) + Math.Pow(Program.engine.player.y - (y + offsetY), 2));
-
-                                    TCODColor color = new TCODColor(200 - ((200 / (engine.player.fovRadius)) * ((byte)distance - 1)), 200 - ((200 / (engine.player.fovRadius)) * ((byte)distance - 1)), 200 - ((200 / (engine.player.fovRadius)) * ((byte)distance)));
-
-                                    level.lightMapConsole.setCharBackground(x, y, color, TCODBackgroundFlag.Set);
-
-                                }
-                                catch (Exception e)
-                                {
-
-                                    Console.WriteLine(e.Message);
-
-                                    throw new Exception(e.Message);
-                                }
-                        
                         if (isExplored(x + offsetX, y + offsetY) || showAllTiles)
+                        {
+
+                            bool explored = tiles[x + offsetX, y + offsetY].explored;
+                            TCODColor src;
+
+                            if (isWall(x + offsetX, y + offsetY))
+                            {
+
+                                src = new TCODColor(darkWall.Red, darkWall.Green, darkWall.Blue);
+                                if (explored)
+                                {
+                                    float v = (float)(((float)((float)darkWall.getValue())));
+                                    float s = (float)(((float)((float)darkWall.getSaturation())));
+                                    src.setSaturation(s);
+                                    src.setValue(v);
+                                }
+                                TCODConsole.root.setCharBackground(x, y, src);
+                            }
+                            else
+                            {
+                                src = new TCODColor(darkGround.Red, darkGround.Green, darkGround.Blue);
+                                if (explored)
+                                {
+
+                                    float v = (float)(((float)((float)darkGround.getValue())));
+                                    float s = (float)(((float)((float)darkGround.getSaturation())));
+                                    src.setSaturation(s);
+                                    src.setValue(v);
+                                }
+                                TCODConsole.root.setCharBackground(x, y, src);
+                            }
+                        }
+
+                        if (getLight(x + offsetX, y + offsetY) > 0 || showAllTiles)
                         {
                             TCODConsole.root.setCharBackground(x, y, isWall(x + offsetX, y + offsetY) ? lightWall : lightGround);
                         }
+                    
+                    tiles[x + offsetX, y + offsetY].light = 0;
                     }
-                    else
-                    {
-                        level.lightMapConsole.setCharBackground(x, y, TCODColor.black, TCODBackgroundFlag.Burn);
-                        if (isExplored(x + offsetX, y + offsetY) || showAllTiles)
-                        {
-                            if (x + offsetX >= 0 && x + offsetX < tiles.GetLength(0) && y + offsetY >= 0 && y + offsetY < tiles.GetLength(1))
-                            {
-                                int memory = tiles[x + offsetX, y + offsetY].memory;
-                                TCODColor src;
-
-                                if (isWall(x + offsetX, y + offsetY))
-                                {
-
-                                    src = new TCODColor(darkWall.Red, darkWall.Green, darkWall.Blue);
-                                    if (memory > 0)
-                                    {
-                                        float v = (float)(((float)((float)darkWall.getValue() / (float)maxPlayerMemory) * memory));
-                                        float s = (float)(((float)((float)darkWall.getSaturation() / (float)maxPlayerMemory) * memory));
-                                        src.setSaturation(s);
-                                        src.setValue(v);
-                                    }
-                                    TCODConsole.root.setCharBackground(x, y, src);
-                                }
-                                else
-                                {
-                                    src = new TCODColor(darkGround.Red, darkGround.Green, darkGround.Blue);
-                                    if (memory > 0)
-                                    {
-                                        
-                                        float v = (float)(((float)((float)darkGround.getValue() / (float)maxPlayerMemory) * memory));
-                                        float s = (float)(((float)((float)darkGround.getSaturation() / (float)maxPlayerMemory) * memory));
-                                        src.setSaturation(s);
-                                        src.setValue(v);
-                                    }
-                                    TCODConsole.root.setCharBackground(x, y, src);
-                                }
-                            }
-                        }
-                    }
-
                 }
+
+
+
+
             }
+
+            if (updateFov)
+                updateFov = false;
+
         }
     }
 }
