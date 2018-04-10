@@ -6,11 +6,16 @@ using Janus.Engine;
 using Janus.Engine.Components;
 using Janus;
 using libtcod;
-class TargetSelector
+public class TargetSelector
 {
     public SelectorType type;
     public float range;
-    public TargetSelector(SelectorType type, float range)
+    public TargetSelector()
+    {
+        type = SelectorType.CLOSEST_MONSTER;
+        range = 5;
+    }
+        public TargetSelector(SelectorType type, float range)
     {
         this.type = type;
         this.range = range;

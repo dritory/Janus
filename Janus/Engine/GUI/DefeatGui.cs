@@ -7,7 +7,7 @@ using Janus;
 using libtcod;
 namespace Janus.Engine.GUI
 {
-    class DefeatGui : Gui
+    public  class DefeatGui : Gui
     {
         public int loading = 0;
 

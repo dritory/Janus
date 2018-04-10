@@ -8,7 +8,7 @@ using libtcod;
 namespace Janus.Engine
 {
     [Serializable()]
-    class A
+    public class A
     {
         public int x;
         public A()
@@ -17,27 +17,26 @@ namespace Janus.Engine
     }
 
     
-    class Actor
+    public class Actor
     {
-
+        
         public int x;
         public int y;
         public int ch;
         public int[] chs;
         public int id;
-        public int depth;
         public TCODColor color;
-
+        [NonSerialized]
         private ActorHandler actorHandler;
 
-        public float rarity;
+        public float rarity = 0;
 
         
         public string name;
         public string pluralName;
 
         public string description;
-
+        
         public List<Component> components = new List<Component>();
 
         public ActorHandler getActorHandler ()
@@ -49,7 +48,11 @@ namespace Janus.Engine
             this.actorHandler = actorHandler;
         }
 
-        public Actor(int id)
+        public Actor()
+        {
+            
+        }
+        public void initialize(int id)
         {
             this.id = id;
         }
@@ -125,6 +128,37 @@ namespace Janus.Engine
         {
             return (Components.Container)getComponent(typeof(Components.Container));
         }
+        public Components.Slot [] getSlots()
+        {
+            List<Components.Slot> slots = new List<Components.Slot>();
+            for (int i = 0; i < components.Count; i++)
+            {
+                if(this.components[i].GetType() == typeof(Components.Slot))
+                {
+                    slots.Add((Components.Slot)components[i]);
+                }
+            }
+            return slots.ToArray();
+        }
+
+        public Component getComponent(string type)
+        {
+            foreach (Component c in components)
+            {
+                Type pt = c.GetType();
+                while (pt != typeof(Component))
+                {
+                    if (pt.Name == type)
+                        return c;
+                    else if (pt.Name.ToLower() == type.ToLower())
+                        return c;
+                    pt = pt.BaseType;
+                }
+
+            }
+            return null;
+        }
+
         public Component getComponent(Type type)
         {
             foreach (Component c in components)
@@ -140,6 +174,16 @@ namespace Janus.Engine
             }
             return null;
         }
+
+        public virtual void load (ActorHandler actorhandler)
+        {
+            setActorHandler(actorhandler);
+            foreach(Component c in components)
+            {
+                c.load(this);
+            }
+        }
+
         public void update()
         {
             update(false);
@@ -157,7 +201,10 @@ namespace Janus.Engine
             this.render(true);
         }
 
-
+        public virtual void renderGui()
+        {
+            
+        }
         public virtual void render(bool inSight)
         {
             if (inSight)
@@ -170,8 +217,8 @@ namespace Janus.Engine
                             TCODConsole.root.setCharForeground(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, color);
                         else
                         {
-                            Console.WriteLine("Color of " + this.name + " was null");
-                            TCODConsole.root.setCharForeground(x - Program.engine.map.offsetX, y - Program.engine.map.offsetY, TCODColor.white);
+                            Console.WriteLine("Color of " + this.name + " was null, setting color to white");
+                            color = TCODColor.white;
                         }
                         foreach (Component c in components)
                         {
@@ -183,7 +230,7 @@ namespace Janus.Engine
             {
                 foreach (Component c in components)
                 {
-                    c.render(true);
+                    c.render(false);
                 }
             }
         }

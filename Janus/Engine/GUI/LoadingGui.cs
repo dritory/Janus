@@ -7,7 +7,7 @@ using Janus;
 using libtcod;
 namespace Janus.Engine.GUI
 {
-    class LoadingGui : Gui
+    public  class LoadingGui : Gui
     {
         public int loading = 0;
         public override void update()

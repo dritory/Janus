@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using libtcod;
 namespace Janus.Engine.GUI {
-    class MessageGui : Gui {
+    public  class MessageGui : Gui {
 
 
         public MessageGui()
@@ -18,7 +18,7 @@ namespace Janus.Engine.GUI {
             base.update();
         }
         public int MSG_X = 5;
-        public int MSG_Y = 50;
+        public int MSG_Y = 55;
         public int MAX_LINES = 10;
 
         private int x = 0, y = 0;

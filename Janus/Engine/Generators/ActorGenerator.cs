@@ -8,7 +8,7 @@ using Janus;
 using libtcod;
 namespace Janus.Engine.Generators
 {
-    class ActorGenerator
+    public class ActorGenerator
     {
         //structure that sorts all known actors in the game
         //first by type
@@ -49,7 +49,7 @@ namespace Janus.Engine.Generators
         {
             if (max != 0 && min < max)
             {
-                double e = Math.Pow(max+1, (rand - min) / (max+1) ) - 1;
+                double e = Math.Pow(max + 1, (rand - min) / (max + 1)) - 1;
 
                 return (float)e;
             }
@@ -62,7 +62,13 @@ namespace Janus.Engine.Generators
 
         }
 
-        public static Actor getRandomActorOfType(string type)
+        public static Actor[] getAllActorsOfType(string type)
+        {
+            SortedList<float, List<Actor>> sortedList = getActorsOfType(type);
+            return sortedList.Values.SelectMany(x => x).ToArray();
+        }
+
+        public static SortedList<float, List<Actor>> getActorsOfType(string type)
         {
             type = type.ToLower();
             SortedList<float, List<Actor>> actors = new SortedList<float, List<Actor>>();
@@ -79,7 +85,7 @@ namespace Janus.Engine.Generators
                     {
                         foreach (float f in referenceList[k].Keys)
                         {
-                            if(actors.ContainsKey(f))
+                            if (actors.ContainsKey(f))
                             {
                                 actors[f].AddRange(referenceList[k][f]);
                             }
@@ -91,9 +97,21 @@ namespace Janus.Engine.Generators
                     }
                 }
             }
+            return actors;
+        }
+
+
+
+        public static Actor getRandomActorOfType(string type)
+        {
+            return getRandomActorOfType(type, 0, maxRarity);
+        }
+        public static Actor getRandomActorOfType(string type, float minRarity, float maxRarity)
+        {
+            SortedList<float, List<Actor>> actors = getActorsOfType(type);
             if (actors != null)
             {
-                float randInt = getRandomRarity(0, maxRarity > actors.Keys.Max() ? maxRarity : actors.Keys.Max());
+                float randInt = getRandomRarity(minRarity > actors.Keys.Min() ? minRarity : actors.Keys.Min(), maxRarity > actors.Keys.Max() ? maxRarity : actors.Keys.Max());
                 float index = float.MaxValue;
 
                 foreach (float k in actors.Keys)

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using libtcod;
-using System.Drawing;
 
 /// 1. Place a number of randomly sized and positioned rooms. If a room
 ///    overlaps an existing room, it is discarded. Any remaining rooms are
@@ -29,15 +28,44 @@ using System.Drawing;
 namespace Janus.Engine.Generators
 {
 
-    enum RoomType
+    public enum RoomType
     {
         empty, normal, entrance, exit
     }
+    public struct Rectangle
+    {
+        public int X;
+        public int Y;
+        public int Height;
+        public int Width;
+        public Rectangle(int X, int Y, int Width, int Height)
+        {
+            this.X = X;
+            this.Y = Y;
+            this.Height = Height;
+            this.Width = Width;
+        }
+    }
+    public struct Point
+    {
+        public int X;
+        public int Y;
+        
+        public Point (int X, int Y)
+        {
+            this.X = X;
+            this.Y = Y;
+        }
+    }
 
-    class Room
+    public class Room
     {
         public Rectangle bounds;
         public RoomType type;
+        public Room()
+        {
+
+        }
         public Room(int x, int y, int width, int height)
         {
             bounds.X = x;
@@ -56,7 +84,7 @@ namespace Janus.Engine.Generators
         }
 
     }
-    class DungeonGenerator : MapGenerator
+    public class DungeonGenerator : MapGenerator
     {
         public enum Direction
         {

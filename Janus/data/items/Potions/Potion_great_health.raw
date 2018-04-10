@@ -1,0 +1,7 @@
+[Name:Greater Healing Potion]
+[Description:A basic healing potion]
+[Char:!]
+[Color:red]
+[Rarity:5] //logaritmic scale?
+[Component:Pickable]
+[Effect:HealthEffect:90]

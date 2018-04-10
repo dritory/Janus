@@ -1,0 +1,10 @@
+[Name:Orc]
+[Description:An evil creature]
+[Char:o]
+[Color:darkGreen]
+[Blocks]
+[Rarity:1]
+[Component:DestructibleMonster:20:0:dead orc]
+[Component:Attacker:7]
+[Component:MonsterAI:0,9]
+

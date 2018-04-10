@@ -6,7 +6,7 @@ using System.Drawing;
 using libtcod;
 namespace Janus.Engine.Generators
 {
-    class CaveGenerator :MapGenerator
+    public class CaveGenerator :MapGenerator
     {
         
         public CaveGenerator(Level level) : base(level)

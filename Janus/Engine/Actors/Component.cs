@@ -5,12 +5,20 @@ using System.Text;
 using libtcod;
 namespace Janus.Engine {
     [Serializable]
-    class Component {
+    public class Component {
 
         public string name;
 
         public object[] args;
+        [NonSerialized]
         public Actor owner;
+
+        public Component()
+        {
+            owner = new Actor();
+            owner.setActorHandler(Program.engine.actorHandler);
+        }
+
         public Component(Actor owner, params object [] args)
         {
             this.owner = owner;
@@ -21,6 +29,11 @@ namespace Janus.Engine {
         public virtual void destroy() {
             owner.components.Remove(this);
         }
+        public virtual void load(Actor owner)
+        {
+            this.owner = owner;
+        }
+
         public virtual void update()
         {
            

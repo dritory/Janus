@@ -9,7 +9,7 @@ using System.Diagnostics;
 using libtcod;
 namespace Janus
 {
-    class ActorLoader
+    public class ActorLoader
     {
 
         public static Dictionary<string, Dictionary<string, string>> actorDirectoriesByType = new Dictionary<string, Dictionary<string, string>>();

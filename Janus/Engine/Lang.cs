@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Janus.Engine {
-    class Lang {
+    public class Lang {
 
 
         public static bool vocal(string s) {

@@ -1,0 +1,6 @@
+[Name:Rock]
+[Char:*]
+[Color:darkGrey]
+[Component:Pickable:SELECTED_MONSTER:5]
+[Effect:HealthEffect:-10:The rock hit the {0} and dealed {1} hitpoints]
+

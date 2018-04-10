@@ -6,7 +6,7 @@ using libtcod;
 namespace Janus.Engine
 {
 
-    class ColoredChar
+    public class ColoredChar
     {
         public char ch;
         public TCODColor color;
@@ -23,7 +23,7 @@ namespace Janus.Engine
         }
     }
 
-    class Line
+    public class Line
     {
 
         public List<ColoredChar> text = new List<ColoredChar>();
@@ -130,7 +130,7 @@ namespace Janus.Engine
         }
     }
 
-    class Message
+    public class Message
     {
 
         public static List<Line> lines = new List<Line>();
@@ -215,7 +215,7 @@ namespace Janus.Engine
             if (lines.Count > 0)
             {
                 string lineText = getLastLine().getString();
-                if (lineText.Contains(s) && s != "Insert command:")
+                if (lineText.Contains(s) && s != ">")
                 {
 
                     if (getLastLine().number > 1)

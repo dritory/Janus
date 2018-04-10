@@ -5,7 +5,7 @@ using System.Text;
 using libtcod;
 namespace Janus
 {
-    class Program
+    public class Program
     {
 
         public static Engine.Engine engine = new Engine.Engine();

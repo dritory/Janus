@@ -1,0 +1,6 @@
+[Name:Sword]
+[Char:-]
+[Color:grey]
+[Component:Tool]
+[Effect:HealthEffect:-7:The sword slashed the {0} and dealed {1} hitpoints]
+

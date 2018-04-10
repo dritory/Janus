@@ -5,31 +5,32 @@ using System.Text;
 using libtcod;
 namespace Janus.Engine
 {
-    [Serializable]
-    struct Tile
+
+    public struct Tile
     {
 
 
 
-        public Tile(string tileID, bool canWalk)
+        public Tile(string tileID, bool canWalk, bool transparent)
         {
             this.canWalk = canWalk;
             //this.explored = explored;
             this.tileID = tileID;
             this.explored = false;
-            this.light = 0;
+            this.transparent = transparent;
         }
         public bool canWalk; // can we walk through this tile?
         // public bool explored; //has been explored?
         public bool explored;
-        public byte light;
+        public bool transparent;
+        
         public string tileID;
 
     };
 
 
 
-    class Map
+    public class Map
     {
 
         public int maxPlayerMemory = 100;
@@ -38,11 +39,19 @@ namespace Janus.Engine
 
 
         public int startx, starty;
-
+        public byte[] _light;
+        public string[] _tileID;
+        public bool[] _explored;
+        public bool[] _transparent;
+        public bool[] _canWalk;
+        [NonSerialized]
         public Tile[,] tiles;
+
         public int width;
         public int height;
+
         public List<Generators.Room> rooms = new List<Generators.Room>();
+        [NonSerialized]
         public Generators.MapGenerator generator;
         public int renderWidth;
         public int renderHeight;
@@ -51,18 +60,21 @@ namespace Janus.Engine
         public int offsetY;
 
         public bool updateFov;
+        public bool updateDynFov;
 
+        [NonSerialized]
         private static Engine engine = Program.engine;
+        [NonSerialized]
         private Level level;
+        [NonSerialized]
         public TCODMap map;
-        public TCODMap torchMap;
+
         public Map(Level level, int renderX, int renderY, int renderWidth, int renderHeight)
         {
             this.width = 101;
             this.height = 101;
             tiles = new Tile[width, height];
             map = new TCODMap(width, height);
-            torchMap = new TCODMap(renderWidth, renderHeight);
             this.renderHeight = renderHeight;
             this.renderWidth = renderWidth;
             this.renderX = renderX;
@@ -70,15 +82,60 @@ namespace Janus.Engine
 
             this.level = level;
 
+        }
+        public void load(Level level)
+        {
+            map = new TCODMap(width, height);
+            tiles = new Tile[width, height];
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    tiles[x, y].transparent = _transparent[tileIndex(x, y)];
+                    tiles[x, y].canWalk = _canWalk[tileIndex(x, y)];
+                    tiles[x, y].explored = _explored[tileIndex(x, y)];
+                    tiles[x, y].tileID = _tileID[tileIndex(x, y)];
+                    map.setProperties(x, y, tiles[x,y].transparent, tiles[x,y].canWalk);
+                }
+            this.level = level;
+        }
+        public void save()
+        {
+            _canWalk = new bool[tiles.GetLength(1) * tiles.GetLength(0)];
+            _light = new byte[tiles.GetLength(1) * tiles.GetLength(0)];
+            _explored = new bool[tiles.GetLength(1) * tiles.GetLength(0)];
+            _tileID = new string[tiles.GetLength(1) * tiles.GetLength(0)];
+            _transparent = new bool[tiles.GetLength(1) * tiles.GetLength(0)];
 
+            for (int y = 0; y < tiles.GetLength(1); y++)
+            {
+                for (int x = 0; x < tiles.GetLength(0); x++)
+                {
+                    tiles[x, y].canWalk = map.isWalkable(x, y);
+                    tiles[x, y].transparent = map.isTransparent(x, y);
+
+                    _canWalk[tileIndex(x,y)] = tiles[x, y].canWalk;
+                    _explored[tileIndex(x, y)] = tiles[x, y].explored;
+                    _tileID[tileIndex(x, y)] = tiles[x, y].tileID;
+                    _transparent[tileIndex(x, y)] = tiles[x, y].transparent;
+                }
+            }
         }
 
-        public static TCODColor darkWall = new TCODColor(20, 20,20);
-        public static TCODColor darkGround = new TCODColor(50, 50,50);
-        public static TCODColor lightWall = new TCODColor(60, 60, 80);
-        public static TCODColor lightGround = new TCODColor(120, 120, 140);
+        private int tileIndex(int x, int y)
+        {
+            return x + y * tiles.GetLength(0);
+        }
+        public static TCODColor darkWall = new TCODColor(30, 30, 50);
+        public static TCODColor darkGround = new TCODColor(120, 120, 140);
+        public static TCODColor lightWall = new TCODColor(30, 30, 50);
+        public static TCODColor lightGround = new TCODColor(70, 70, 80);
         #region methods
+
         public void generate()
+        {
+            generate(typeof(Generators.MapGenerator));
+        }
+        public void generate(Type mapGenerator)
         {
             engine = Program.engine;
             engine.gameStatus = GameStatus.LOADING;
@@ -90,7 +147,7 @@ namespace Janus.Engine
 
             Message.lines = new List<Line>();
             rooms = new List<Generators.Room>();
-            generator = new Generators.MapGenerator(level);
+            generator = (Generators.MapGenerator) Activator.CreateInstance(mapGenerator, level);
             generator.generate();
             updateFov = true;
             Console.WriteLine("..Succeed!");/*
@@ -120,17 +177,10 @@ namespace Janus.Engine
         }
         public bool isExplored(int x, int y)
         {
-            if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
+            if (x >= 0 && x < width && y >= 0 && y < height)
                 return tiles[x, y].explored;
             else
                 return false;
-        }
-        public byte getLight(int x, int y)
-        {
-            if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
-                return tiles[x, y].light;
-            else
-                return 0;
         }
 
         public bool isWall(int x, int y)
@@ -139,9 +189,16 @@ namespace Janus.Engine
         }
         public void setWall(int x, int y)
         {
-            map.setProperties(x, y, false, false);
-        }
+            if (x >= 0 && x < width && y >= 0 && y < height)
+            {
+                tiles[x, y].canWalk = false;
+                tiles[x, y].transparent = false;
+                tiles[x, y].tileID = "wall";
 
+                map.setProperties(x, y, false, false);
+            }
+        }
+        
         public bool canWalk(int x, int y)
         {
             if (isWall(x, y))
@@ -154,6 +211,11 @@ namespace Janus.Engine
                 }
             }
             return true;
+        }
+
+        public void setExplored(int x, int y, bool explored)
+        {
+            tiles[x, y].explored = explored;
         }
 
         public void dig(int x1, int y1, int x2, int y2)
@@ -176,6 +238,9 @@ namespace Janus.Engine
                 {
                     if (tilex >= 0 && tiley >= 0 && tilex < width && tiley < height)
                     {
+                        tiles[tilex, tiley].transparent = true;
+                        tiles[tilex, tiley].canWalk = true;
+                        tiles[tilex, tiley].tileID = null;
                         map.setProperties(tilex, tiley, true, true);
 
                     }
@@ -192,8 +257,6 @@ namespace Janus.Engine
         public void validate()
         {
             Program.engine.update(true);
-
-
         }
 
         public void update()
@@ -211,7 +274,7 @@ namespace Janus.Engine
                 time = 0;
             }
             time++;
-
+            
             for (int x = renderX; x < renderWidth; x++)
             {
                 for (int y = renderY; y < renderHeight; y++)
@@ -251,13 +314,7 @@ namespace Janus.Engine
                                 TCODConsole.root.setCharBackground(x, y, src);
                             }
                         }
-
-                        if (getLight(x + offsetX, y + offsetY) > 0 || showAllTiles)
-                        {
-                            TCODConsole.root.setCharBackground(x, y, isWall(x + offsetX, y + offsetY) ? lightWall : lightGround);
-                        }
-                    
-                    tiles[x + offsetX, y + offsetY].light = 0;
+                        
                     }
                 }
 
@@ -265,10 +322,9 @@ namespace Janus.Engine
 
 
             }
-
-            if (updateFov)
-                updateFov = false;
-
+            
+            updateFov = false;
+            updateDynFov = false;
         }
     }
 }

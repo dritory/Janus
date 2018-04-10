@@ -1,0 +1,9 @@
+[Name:Kobold]
+[Description:A malevolent reptilian found of traps and mining]
+[Char:k]
+[Color:yellow]
+[Blocks]
+[Component:DestructibleMonster:10:0:dead kobold]
+[Component:Attacker:5]
+[Component:MonsterAI:1,1]
+

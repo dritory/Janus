@@ -1,0 +1,7 @@
+[Name:Lesser Healing Potion]
+[Description:A basic healing potion]
+[Char:!]
+[Color:red]
+[Rarity:1] //logaritmic scale?
+[Component:Pickable]
+[Effect:HealthEffect:20]

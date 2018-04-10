@@ -6,26 +6,39 @@ using libtcod;
 
 namespace Janus.Engine
 {
-    class ActorHandler
+    public class ActorHandler
     {
         public List<Actor> actors = new List<Actor>();
-
+        [NonSerialized]
         public Level level;
+
         private Map map { get { return level.map; } }
+        [NonSerialized]
         public TCODMouseData mousedata;
-        
-        public ActorHandler(Level level)
+
+        public ActorHandler()
+        {
+
+        }
+
+        public void initialize(bool restarting, Level level)
         {
             this.level = level;
-        }
-        public void initialize(bool restarting)
-        {
             actors = new List<Actor>();
             if (!restarting)
             {
                 ActorLoader.getAllActorDirectories();
                 Generators.ActorGenerator.getReferenceActors();
-                
+
+            }
+        }
+        public void load(Level level)
+        {
+            this.level = level;
+            for (int i = 0; i < actors.Count; i++)
+            {
+                if(actors[i] != null)
+                    actors[i].load(this);
             }
         }
         public void update()
@@ -70,6 +83,9 @@ namespace Janus.Engine
             return closest;
 
         }
+
+
+
         public bool pickATile(out int x, out int y)
         {
             return pickATile(out x, out y, 0.0f);
@@ -96,7 +112,7 @@ namespace Janus.Engine
             while (!TCODConsole.isWindowClosed())
             {
                 render();
-                
+
 
                 mousedata = TCODMouse.getStatus();
                 Program.engine.key = TCODConsole.checkForKeypress((int)TCODKeyStatus.KeyPressed);
@@ -179,7 +195,7 @@ namespace Janus.Engine
 
         public void addActor(Actor actor)
         {
-           
+
             actor.setActorHandler(this);
             actors.Add(actor);
             if (actor.blocks)
@@ -202,7 +218,7 @@ namespace Janus.Engine
 
         public int getUniqueId()
         {
-            int id = actors.Count + 1;
+            int id = actors.Count + 2;
 
 
             return id;
@@ -237,18 +253,37 @@ namespace Janus.Engine
                 return null;
 
         }
+
+        public void renderGui()
+        {
+            foreach (Actor actor in actors)
+            {
+                actor.renderGui();
+            }
+
+        }
+
         public void render()
         {
             foreach (Actor actor in actors)
             {
-                if (Program.engine.player.fov.isInFov(actor.x, actor.y) &&
-                    actor.x < map.renderWidth + Program.engine.currentLevel.map.offsetX &&
-                    actor.y < map.renderHeight + Program.engine.currentLevel.map.offsetY &&
-                    actor.x > Program.engine.currentLevel.map.offsetX &&
-                    actor.y > Program.engine.currentLevel.map.offsetY)
-                    actor.render(true);
-                else
-                    actor.render(false);
+                if (actor.x > map.offsetX && actor.x < map.offsetX + map.renderWidth)
+                {
+                    if (actor.y > map.offsetY && actor.y < map.offsetY + map.renderHeight)
+                    {
+                        if ((Program.engine.player.fov.isInFov(actor.x, actor.y) &&
+                            actor.x < map.renderWidth + Program.engine.currentLevel.map.offsetX &&
+                            actor.y < map.renderHeight + Program.engine.currentLevel.map.offsetY &&
+                            actor.x > Program.engine.currentLevel.map.offsetX &&
+                            actor.y > Program.engine.currentLevel.map.offsetY) || map.showAllTiles)
+                        {
+                            actor.render(true);
+
+                        }
+                    }
+                }
+
+                actor.render(false);
             }
         }
     }

@@ -5,18 +5,22 @@ using System.Text;
 using Janus;
 using Janus.Engine;
 using Janus.Engine.Components;
+using Janus.Engine.Components.Pickables;
 using CColor = System.Drawing.Color;
 using libtcod;
-static class Raw
+static public class Raw
 {
 
     internal static Actor actor;
-    internal static List<Effect> effects;
+    internal static List<Effect> activeEffects;
+    internal static List<Effect> passiveEffects;
     public static Actor DeserializeActor(string s, int id)
     {
 
-        actor = new Actor(id);
-        effects = new List<Effect>();
+        actor = new Actor();
+        actor.initialize(id);
+        activeEffects = new List<Effect>();
+        passiveEffects = new List<Effect>();
         for (int i = 0; i < s.Length; i++)
         {
             if (s[i] == '[')
@@ -32,22 +36,36 @@ static class Raw
                 addToken(t);
 
             }
-            if(s[i] == '/' && s[i - 1] == '/' && i + 1  < s.Length)
+            if (s[i] == '/' && s[i - 1] == '/' && i + 1 < s.Length)
             {
-                while(s[i] != '\n')
+                while (s[i] != '\n' && i < s.Length)
                 {
                     i++;
                 }
-               
+
             }
         }
-        Pickable p = (Pickable)actor.getComponent(typeof(Pickable));
-        if (effects.Count > 0 && p != null)
-        {
-            p.effects = effects;
-        }
 
-        
+
+
+        if (passiveEffects.Count > 0 || activeEffects.Count > 0)
+        {
+            Wearable item = (Wearable)actor.getComponent(typeof(Wearable));
+            if (item != null)
+            {
+                item.activeEffects = activeEffects;
+                item.passiveEffects = passiveEffects;
+            }
+            else
+            {
+                Pickable p = (Pickable)actor.getComponent(typeof(Pickable));
+                if (p != null)
+                {
+                    p.activeEffects = activeEffects;
+                }
+            }
+
+        }
 
         return actor;
 
@@ -115,31 +133,55 @@ static class Raw
             {
                 try
                 {
-                    string s = "Janus.Engine.Components.Effects." + values[0];
-                    Type effType = Type.GetType("Janus.Engine.Components.Effects." + values[0], true);
+                    int index = 0;
 
-                    if (effType != null)
+                    bool active = true;
+                    if (values[0].ToLower() == "active")
                     {
-                        try
-                        {
+                        index = 1;
+                    }
+                    else if (values[0].ToLower() == "passive")
+                    {
+                        index = 1;
+                        active = false;
+                    }
+                    if (values.Length > index)
+                    {
+                        string name = values[index];
+                        string s = "Janus.Engine.Components.Effects." + name;
+                        Type effType = Type.GetType("Janus.Engine.Components.Effects." + name, true);
 
-                            List<string> o = new List<string>();
-                            for (int i = 1; i < values.Length; i++)
+                        if (effType != null)
+                        {
+                            try
                             {
-                                o.Add(values[i]);
-                            }
-                            Effect effect = new Effect(o.ToArray());
-                            if (o.Count > 0)
-                                effect = (Effect)Activator.CreateInstance(effType, false, o.ToArray());
-                            else
-                                effect = (Effect)Activator.CreateInstance(effType, false);
 
-                            effects.Add(effect);
-                        }
-                        catch (Exception exc)
-                        {
-                            Console.WriteLine(exc.Message);
-                            throw new Exception(exc.Message);
+                                List<string> o = new List<string>();
+                                for (int i = index + 1; i < values.Length; i++)
+                                {
+                                    o.Add(values[i]);
+                                }
+
+                                Effect effect = new Effect(o.ToArray());
+                                if (o.Count > 0)
+                                    effect = (Effect)Activator.CreateInstance(effType, o.ToArray());
+                                else
+                                    effect = (Effect)Activator.CreateInstance(effType);
+
+                                if (active)
+                                {
+                                    activeEffects.Add(effect);
+                                }
+                                else
+                                {
+                                    passiveEffects.Add(effect);
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                Console.WriteLine(exc.Message);
+                                throw new Exception(exc.Message);
+                            }
                         }
                     }
                 }
@@ -204,7 +246,8 @@ static class Raw
                     }
                 case "Char":
                     {
-                        try{
+                        try
+                        {
                             int ch = 0;
                             if (int.TryParse(values[0], out ch))
                                 actor.ch = ch;

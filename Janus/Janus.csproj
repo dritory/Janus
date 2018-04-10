@@ -53,7 +53,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="bin\Debug\data\items\potions\Potion_lesser_health.raw" />
+    <None Include="data\items\potions\Potion_lesser_health.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Content\font.ttf" />
     <None Include=".DS_Store" />
     <None Include="libSDL.so" />
@@ -79,16 +81,45 @@
     <None Include="Names\mingos_town.cfg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\data\blocks\Door_wood.raw" />
-    <Content Include="bin\Debug\data\blocks\Granite.raw" />
-    <Content Include="bin\Debug\data\blocks\Stair.raw" />
-    <Content Include="bin\Debug\data\blocks\Torch.raw" />
-    <Content Include="bin\Debug\data\creatures\Kobold.raw" />
-    <Content Include="bin\Debug\data\creatures\Raw.raw" />
-    <Content Include="bin\Debug\data\creatures\Orc.raw" />
-    <Content Include="bin\Debug\data\creatures\Troll.raw" />
-    <None Include="bin\Debug\data\items\potions\Potion_great_health.raw" />
-    <Content Include="bin\Debug\data\items\Rock_throwable.raw" />
+    <Content Include="data\blocks\Door_wood.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\blocks\Granite.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\blocks\Stair.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\blocks\Torch_green.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\blocks\Torch_blue.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\blocks\Torch.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\creatures\Kobold.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\creatures\Raw.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\creatures\Orc.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\creatures\Troll.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="data\items\potions\Potion_great_health.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="data\items\Torch_tool.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\items\Rock_throwable.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\curses_640x300.bmp" />
     <Content Include="Content\curses_640x300.png" />
     <Content Include="Content\curses_800x600.bmp" />
@@ -98,17 +129,15 @@
     <Content Include="Content\font license.txt" />
     <Content Include="celtic_garamond_10x10_gs_tc.png" />
     <Content Include="circle.png" />
+    <Content Include="data\items\weapons\Sword.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="terminal.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="terminal8x8_gs_ro.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Tools\fastJSON\fastJSON net35.csproj" />
-    <Content Include="Tools\fastJSON\fastJSON-android.csproj" />
-    <Content Include="Tools\fastJSON\fastJSON-SL.csproj" />
-    <Content Include="Tools\fastJSON\fastJSON.csproj" />
-    <Content Include="Tools\fastJSON\history.txt" />
     <None Include="libtcod-net-unmanaged.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -132,8 +161,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestApp.exe" />
-    <None Include="Tools\fastJSON\fastJSON.snk" />
-    <None Include="Tools\fastJSON\README.md" />
     <None Include="zlib1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -156,35 +183,47 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Content Include="data\items\armor\Chain_Mail.raw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Engine\Actors\Actor.cs" />
     <Compile Include="Engine\Actors\ActorHandler.cs" />
     <Compile Include="Engine\Actors\Component.cs" />
-    <Compile Include="Engine\Actors\Components\AI.cs" />
-    <Compile Include="Engine\Actors\Components\AIs\ConfusedMonsterAi.cs" />
-    <Compile Include="Engine\Actors\Components\AIs\MonsterAI.cs" />
-    <Compile Include="Engine\Actors\Components\AIs\PlayerAI.cs" />
-    <Compile Include="Engine\Actors\Components\AIs\TemporaryAi.cs" />
-    <Compile Include="Engine\Actors\Components\Attacker.cs" />
-    <Compile Include="Engine\Actors\Components\Blocks\Activatable.cs" />
-    <Compile Include="Engine\Actors\Components\Blocks\Door.cs" />
-    <Compile Include="Engine\Actors\Components\Blocks\Portal.cs" />
-    <Compile Include="Engine\Actors\Components\Blocks\Stair.cs" />
-    <Compile Include="Engine\Actors\Components\Container.cs" />
-    <Compile Include="Engine\Actors\Components\Destructible.cs" />
-    <Compile Include="Engine\Actors\Components\DestructibleMonster.cs" />
-    <Compile Include="Engine\Actors\Components\Effect.cs" />
-    <Compile Include="Engine\Actors\Components\Effects\ChangeAiEffect.cs" />
-    <Compile Include="Engine\Actors\Components\Effects\HealthEffect.cs" />
-    <Compile Include="Engine\Actors\Components\Pickable.cs" />
+    <Compile Include="Engine\Components\AI.cs" />
+    <Compile Include="Engine\Components\AIs\ConfusedMonsterAi.cs" />
+    <Compile Include="Engine\Components\AIs\MonsterAI.cs" />
+    <Compile Include="Engine\Components\AIs\PlayerAI.cs" />
+    <Compile Include="Engine\Components\AIs\TemporaryAi.cs" />
+    <Compile Include="Engine\Components\Attacker.cs" />
+    <Compile Include="Engine\Components\Blocks\Activatable.cs" />
+    <Compile Include="Engine\Components\Blocks\Door.cs" />
+    <Compile Include="Engine\Components\Blocks\Portal.cs" />
+    <Compile Include="Engine\Components\Blocks\Stair.cs" />
+    <Compile Include="Engine\Components\Container.cs" />
+    <Compile Include="Engine\Components\Destructible.cs" />
+    <Compile Include="Engine\Components\DestructibleMonster.cs" />
+    <Compile Include="Engine\Components\DynamicFov.cs" />
+    <Compile Include="Engine\Components\Effect.cs" />
+    <Compile Include="Engine\Components\Effects\ArmorEffect.cs" />
+    <Compile Include="Engine\Components\Effects\ChangeAiEffect.cs" />
+    <Compile Include="Engine\Components\Effects\LightEffect.cs" />
+    <Compile Include="Engine\Components\Effects\HealthEffect.cs" />
+    <Compile Include="Engine\Components\Pickables\Mail.cs" />
+    <Compile Include="Engine\Components\Pickables\Tool.cs" />
+    <Compile Include="Engine\Components\Pickables\Wearable.cs" />
+    <Compile Include="Engine\Components\Pickable.cs" />
+    <Compile Include="Engine\Components\Slot.cs" />
     <Compile Include="Engine\Engine.cs" />
-    <Compile Include="Engine\Actors\Components\Fov.cs" />
+    <Compile Include="Engine\Components\Fov.cs" />
     <Compile Include="Engine\Generators\ActorGenerator.cs" />
     <Compile Include="Engine\Generators\CaveGenerator.cs" />
     <Compile Include="Engine\Generators\DungeonGenerator.cs" />
+    <Compile Include="Engine\Generators\TestLevelGenerator.cs" />
     <Compile Include="Engine\GUI\Gui.cs" />
     <Compile Include="Engine\GUI\ContainerGui.cs" />
     <Compile Include="Engine\GUI\DefeatGui.cs" />
     <Compile Include="Engine\GUI\LoadingGui.cs" />
+    <Compile Include="Engine\GUI\MenuGui.cs" />
     <Compile Include="Engine\GUI\MessageGui.cs" />
     <Compile Include="Engine\Lang.cs" />
     <Compile Include="Engine\Level.cs" />
@@ -236,10 +275,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\Debug\data\config\" />
-    <Folder Include="bin\Debug\data\saves\" />
-    <Folder Include="Engine\Actors\Components\Effects\Pickables\" />
-    <Folder Include="Tools\fastJSON\Properties\" />
+    <Folder Include="bin\Debug\" />
+    <Folder Include="data\config\" />
+    <Folder Include="data\saves\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

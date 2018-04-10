@@ -8,40 +8,61 @@ using Janus.Engine;
 using Janus.Engine.Components;
 namespace Janus.Tools
 {
-    class Commands
+    public class Commands
     {
-        public Engine.Engine engine;
+        public Engine.Engine engine = Program.engine;
 
+        private List<string> record = new List<string>() { "" };
+        private int index = 0;
+
+        private bool locked = false;
         public void initialize(Engine.Engine engine)
         {
             this.engine = engine;
         }
         public void update()
         {
-           if (engine.gameStatus == GameStatus.STARTUP || engine.gameStatus == GameStatus.IDLE)
+            if (engine.gameStatus == GameStatus.STARTUP || engine.gameStatus == GameStatus.IDLE)
             {
                 if (engine.gameStatus == GameStatus.STARTUP)
-                    engine.player.fov.computeFov();
+                    engine.player.fov.updateFov();
                 engine.gameStatus = GameStatus.IDLE;
 
-                if (engine.key.Character == '|' || engine.key.Character == '`')
+                if (engine.key.Character == '|' || engine.key.Character == '`' || locked)
                 {
-                    Message.WriteLine("Insert command:");
+                    Message.WriteLine(">");
 
-                    string s = getInput().ToLower();
+                    string s = getInput(record[index]).ToLower();
 
+                    locked = false;
+                    engine.player.paused = false;
+                    if(s == "|")
+                    {
+                        Message.unwriteLastLine();
+                        return;
+                    }
+                    if (s != "" && s != "up" && s != "down")
+                    {
+                        record[index] = s;
+                        record.Add("");
+                        index = record.Count - 1;
+                    }
+                    
                     string[] coms = s.Split(' ');
 
-                    
+
                     string com = "";
                     string[] args = new string[0];
-                    if (coms.Length > 0) {
+                    if (coms.Length > 0)
+                    {
                         com = coms[0];
-                        if(coms.Length > 1)
+                        if (coms.Length > 1)
                             args = new string[coms.Length - 1];
                     }
                     for (int i = 0; i < args.Length; i++)
                         args[i] = coms[i + 1];
+
+
 
                     switch (com)
                     {
@@ -56,6 +77,32 @@ namespace Janus.Tools
                                 break;
                             }
 
+                        case "save":
+                            {
+                                string file = "save";
+                                if (args.Length > 0)
+                                {
+                                    file = args[0].ToString();
+                                }
+                                bool success = Saver.saveGame(file);
+                                if (success)
+                                    Message.WriteLine("Saving complete");
+                                else
+                                    Message.WriteLine("Saving failed");
+                                break;
+                            }
+                        case "load":
+                            {
+                                if (args.Length > 0)
+                                {
+                                    bool success = Saver.loadGame((args[0].ToString()));
+                                    if (success)
+                                        Message.WriteLine("Loading complete");
+                                    else
+                                        Message.WriteLine("Could not find load file");
+                                }
+                                break;
+                            }
                         case "generatemap":
                         case "generate":
                         case "gen":
@@ -82,7 +129,7 @@ namespace Janus.Tools
                                         string pluralname = "";
                                         if (args.Length > 1) //Kill one type of actors
                                             pluralname = args[1];
-                                        
+
 
                                         for (int i = 0; i < engine.actorHandler.actors.Count; i++)
                                         {
@@ -91,7 +138,7 @@ namespace Janus.Tools
                                                 Actor a = engine.actorHandler.actors[i];
                                                 if (a != engine.player && (pluralname == "" || pluralname == a.pluralName))
                                                 {
-                                                   
+
                                                     Janus.Engine.Components.Destructible d = a.getDestructible();
                                                     if (d != null && d.hp > 0)
                                                     {
@@ -101,9 +148,9 @@ namespace Janus.Tools
                                                 }
                                             }
                                         }
-                                        
+
                                     }
-                                    
+
                                 }
                                 else
                                 {
@@ -112,7 +159,7 @@ namespace Janus.Tools
                                 break;
                             }
 
-                      
+
 
                         case "noclip":
                         case "ncl":
@@ -145,12 +192,13 @@ namespace Janus.Tools
                         case "s":
                         case "create":
                             {
-                                spawn();
+                                spawn(args);
                                 break;
                             }
                         case "give":
                             {
-                                give();
+
+                                give(args);
                                 break;
                             }
                         case "showall":
@@ -184,9 +232,42 @@ namespace Janus.Tools
                             }
                         case "":
                             {
-
+                                Message.unwriteLastLine();
                                 break;
                             }
+                        case "up":
+                            {
+                                if (index > 0)
+                                {
+                                    index--;
+                                }
+                                else
+                                {
+                                    index = record.Count - 1;
+                                }
+                                Message.unwriteLastLine();
+
+                                locked = true;
+                                engine.player.paused = true;
+                                break;
+                            }
+                        case "down":
+                            {
+                                if (index < record.Count - 1)
+                                {
+                                    index++;
+                                }
+                                else
+                                {
+                                    index = 0;
+                                }
+                                Message.unwriteLastLine();
+
+                                locked = true;
+                                engine.player.paused = true;
+                                break;
+                            }
+
                         default:
                             {
                                 Message.WriteLine("Unknown or incorrect command");
@@ -194,6 +275,7 @@ namespace Janus.Tools
                             }
 
                     }
+
                 }
 
 
@@ -210,24 +292,46 @@ namespace Janus.Tools
             }
         }
 
-        private void give()
+        private void give(string[] args)
         {
-            Message.WriteLine("What would you like to have?");
-            Message.WriteLineC(TCODColor.yellow, "(Syntax: \"Name;Number\")");
-            Message.Write(":");
-            string name = getInput();
+            string name = "";
             int number = 1;
-            if (name.Contains(';'))
+            if (args.Length == 0)
             {
-                string[] s = name.Split(';');
-                name = s[0];
-                if (!int.TryParse(s[1], out number))
+                Message.WriteLine("What would you like to have?");
+                Message.WriteLineC(TCODColor.yellow, "(Syntax: \"Name;Number\")");
+                Message.Write(":");
+                name = getInput();
+                if (name.Contains(';'))
                 {
-                    Message.WriteLine("Incorrect number");
-                    number = 1;
+                    string[] s = name.Split(';');
+                    name = s[0];
+                    if (!int.TryParse(s[1], out number))
+                    {
+                        Message.WriteLine("Incorrect number");
+                        number = 1;
+                    }
+                    if (number == 0)
+                        number = 1;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (!int.TryParse(args[i], out number))
+                    {
+                        name += args[i].ToLower() + " ";
+                    }
+                }
+                if (name[name.Length - 1] == ' ')
+                {
+                    name = name.Remove(name.Length - 1);
                 }
                 if (number == 0)
+                {
                     number = 1;
+                }
             }
             if (ActorLoader.actorDirectories.ContainsKey(name))
             {
@@ -244,6 +348,7 @@ namespace Janus.Tools
                         for (int i = 0; i < number; i++)
                         {
                             engine.player.getContainer().add(actors[i]);
+                            engine.player.playerAi.tryWear(engine.player, actors[i]);
                         }
 
                         Message.WriteLine("*Gives you stuff*");
@@ -260,26 +365,53 @@ namespace Janus.Tools
             }
         }
 
-        private void spawn()
+        private void spawn(string[] args)
         {
-            Message.WriteLine("What would you like to spawn?");
-            Message.WriteLineC(TCODColor.yellow, "(Syntax: \"Name;Number\")");
-            Message.Write(":");
-            string name = getInput();
-            name = name.ToLower();
+            string name = "";
+
             int number = 1;
-            if (name.Contains(';'))
+            if (args.Length == 0)
             {
-                string[] s = name.Split(';');
-                name = s[0];
-                if (!int.TryParse(s[1], out number))
+                Message.WriteLine("What would you like to spawn?");
+                Message.WriteLineC(TCODColor.yellow, "(Syntax: \"Name;Number\")");
+                Message.Write(":");
+                name = getInput();
+                name = name.ToLower();
+
+
+                if (name.Contains(';'))
                 {
-                    Message.WriteLine("Incorrect number");
-                    number = 1;
+                    string[] s = name.Split(';');
+                    name = s[0];
+                    if (!int.TryParse(s[1], out number))
+                    {
+                        Message.WriteLine("Incorrect number");
+                        number = 1;
+                    }
+                    if (number == 0)
+                        number = 1;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (!int.TryParse(args[i], out number))
+                    {
+                        name += args[i].ToLower() + " ";
+                    }
+                }
+                if (name[name.Length - 1] == ' ')
+                {
+                    name = name.Remove(name.Length - 1);
                 }
                 if (number == 0)
+                {
                     number = 1;
+                }
             }
+
+
             if (ActorLoader.actorDirectories.ContainsKey(name))
             {
                 List<Actor> actors = new List<Actor>();
@@ -402,12 +534,18 @@ namespace Janus.Tools
         }
         private string getInput()
         {
-            string s = "";
+            return getInput("");
+        }
+        private string getInput(string initial)
+        {
+            string s = initial;
+            Message.Write(s);
             while (true && !TCODConsole.isWindowClosed())
             {
                 engine.key = TCODConsole.checkForKeypress((int)TCODKeyStatus.KeyPressed);
                 engine.render();
                 TCODConsole.flush();
+                
                 if (engine.key.KeyCode == TCODKeyCode.Enter)
                 {
                     break;
@@ -420,12 +558,36 @@ namespace Janus.Tools
                         Message.unwriteLastChar();
                     }
                 }
+                if (engine.key.KeyCode == TCODKeyCode.Up)
+                {
+                    if (s != "")
+                    {
+
+                        record[index] = s;
+                    }
+                    s = "up";
+                    break;
+                }
+                if (engine.key.KeyCode == TCODKeyCode.Down)
+                {
+                    if (s != "")
+                    {
+
+                        record[index] = s;
+                    }
+                    s = "down";
+                    break;
+                }
                 if (!char.IsControl(engine.key.Character))
                 {
                     Message.Write(engine.key.Character.ToString());
                     s += engine.key.Character;
+                    if (engine.key.Character == '|')
+                    {
+                        break;
+                    }
+                    
                 }
-
 
             }
             return s;

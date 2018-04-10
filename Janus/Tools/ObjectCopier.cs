@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 /// Provides a method for performing a deep copy of an object.
 /// Binary Serialization is used to perform the copy.
 /// </summary>
-public static class ObjectCopier
+public static  class ObjectCopier
 {
     /// <summary>
     /// Perform a deep Copy of the object.

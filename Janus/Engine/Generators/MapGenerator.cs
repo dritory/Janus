@@ -6,7 +6,7 @@ using libtcod;
 namespace Janus.Engine.Generators
 {
 
-    class MapGenerator
+    public class MapGenerator
     {
         public Level level;
         public Map map { get { return level.map; } }
@@ -26,11 +26,12 @@ namespace Janus.Engine.Generators
                     if (map.showAllTiles == true)
                         map.tiles[x, y].explored = true;
                     map.tiles[x, y].tileID = "wall";
+                    map.tiles[x, y].transparent = !walls;
                     map.map.setProperties(x, y, !walls, !walls);
                 }
         }
 
-        public void generate()
+        public virtual void generate()
         {
 
             resetMap(true);
@@ -135,7 +136,7 @@ namespace Janus.Engine.Generators
             TCODRandom rng = TCODRandom.getInstance();
             if (rng.getInt(0, 100) < 70)
             {
-                if (rng.getInt(0, 100) < 40)
+                if (rng.getInt(0, 100) < 60)
                 {
                     Actor kobold = ActorLoader.getActor("kobold");
 
@@ -147,7 +148,7 @@ namespace Janus.Engine.Generators
                     }
 
                 }
-                else if (rng.getInt(0, 100) < 70)
+                else if (rng.getInt(0, 100) < 90)
                 {
 
                     Actor orc = ActorLoader.getActor("orc");
@@ -201,16 +202,17 @@ namespace Janus.Engine.Generators
                 {
                     map.offsetY += 10;
                 }
-                addActor(map.startx + 2, map.starty, "Torch");
+                
                 addPortal(map.startx, map.starty, 1);
-
+                addActor(x1, y1 +((y2 - y1) / 3), "Wall Torch");
             }
             else if (type == RoomType.exit)
             {
-                addPortal(x1 + ((x2 - x1) / 2), y1 + ((y2 - y1) / 2), -1);
+                addPortal(x1 + ((x2 - x1) / 2), y1 -1 + ((y2 - y1) / 2), -1);
             }
             else
             {
+               
                 TCODRandom rng = TCODRandom.getInstance();
                 int nbMonsters = rng.getInt(0, DungeonGenerator.ROOM_MAX_MONSTERS);
                 while (nbMonsters > 0)
@@ -219,9 +221,10 @@ namespace Janus.Engine.Generators
                     int y = rng.getInt(y1, y2);
                     if (map.canWalk(x, y))
                     {
-                        addRandomActorOfType(x, y, "creature*");
+                        addRandomActorOfType(x, y, "creatures*");
                     }
                     nbMonsters--;
+
                 }
                 int nbItems = rng.getInt(0, DungeonGenerator.ROOM_MAX_ITEMS);
                 while (nbItems > 0)
@@ -234,6 +237,7 @@ namespace Janus.Engine.Generators
                     }
                     nbItems--;
                 }
+                addActor(x1, y1 + ((y2 - y1) / 3), "Wall Torch");
             }
 
         }
